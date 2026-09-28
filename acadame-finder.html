@@ -267,7 +267,7 @@ async function doSignIn() {
       response_mode:         "query",
     });
 
-    window.location.href = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${params}`;
+    window.location.href = `https://login.microsoftonline.com/a88bd07b-c574-4fea-b28b-31e5482fca8e/oauth2/v2.0/authorize?${params}`;
   } catch(e) {
     showErr("Sign-in failed: " + e.message);
   }
@@ -318,7 +318,7 @@ async function handleCallback() {
       code_verifier: verifier,
     });
 
-    const res  = await fetch("https://login.microsoftonline.com/common/oauth2/v2.0/token", {
+    const res  = await fetch("https://login.microsoftonline.com/a88bd07b-c574-4fea-b28b-31e5482fca8e/oauth2/v2.0/token", {
       method:  "POST",
       headers: {"Content-Type": "application/x-www-form-urlencoded"},
       body:    body.toString(),
@@ -361,7 +361,7 @@ async function refreshToken() {
       refresh_token: rt,
       scope:         SCOPES.join(" ") + " offline_access",
     });
-    const res  = await fetch("https://login.microsoftonline.com/common/oauth2/v2.0/token", {
+    const res  = await fetch("https://login.microsoftonline.com/a88bd07b-c574-4fea-b28b-31e5482fca8e/oauth2/v2.0/token", {
       method:  "POST",
       headers: {"Content-Type": "application/x-www-form-urlencoded"},
       body:    body.toString(),
