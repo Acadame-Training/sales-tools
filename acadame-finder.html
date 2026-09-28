@@ -279,17 +279,33 @@ async function handleCallback() {
   const state = params.get("state");
   const error = params.get("error");
 
+  console.log("handleCallback: code=", code ? code.substring(0,20)+"..." : "null");
+  console.log("handleCallback: state=", state);
+  console.log("handleCallback: error=", error);
+
   if (error) {
-    showErr("Sign-in error: " + params.get("error_description"));
+    const desc = params.get("error_description") || error;
+    console.error("Auth error:", desc);
+    showErr("Sign-in error: " + desc);
     return false;
   }
-  if (!code) return false;
+  if (!code) {
+    console.log("No code found in URL, returning false");
+    return false;
+  }
 
   const savedState    = sessionStorage.getItem("pkce_state");
   const verifier      = sessionStorage.getItem("pkce_verifier");
   const redirectUri   = "https://acadame-training.github.io/sales-tools/acadame-finder.html";
 
-  if (state !== savedState) { showErr("State mismatch — please try signing in again."); return false; }
+  console.log("savedState=", savedState, "state match=", state === savedState);
+  console.log("verifier exists=", !!verifier);
+
+  if (state !== savedState) {
+    console.error("State mismatch! saved:", savedState, "received:", state);
+    showErr("State mismatch — session may have expired. Please try signing in again.");
+    return false;
+  }
 
   show("loading-s"); el("load-msg").textContent = "Completing sign-in…";
 
@@ -308,7 +324,11 @@ async function handleCallback() {
       body:    body.toString(),
     });
     const data = await res.json();
-    if (data.error) throw new Error(data.error_description || data.error);
+    console.log("Token response keys:", Object.keys(data));
+    if (data.error) {
+      console.error("Token error:", data.error, data.error_description);
+      throw new Error(data.error_description || data.error);
+    }
 
     accessToken = data.access_token;
     if (data.refresh_token) sessionStorage.setItem("refresh_token", data.refresh_token);
@@ -465,16 +485,23 @@ function clearP(){el("pq").value="";el("pc").value="";renderP();}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
+  const qs = window.location.search;
+  console.log("init() — search params:", qs);
   // Check if returning from auth redirect
-  if (window.location.search.includes("code=")) {
+  if (qs.includes("code=") || qs.includes("error=")) {
+    console.log("Detected auth callback, running handleCallback()");
     const ok = await handleCallback();
+    console.log("handleCallback returned:", ok);
     if (ok) { await loadData(); return; }
+    return;
   }
   // Check for existing refresh token
   if (sessionStorage.getItem("refresh_token")) {
+    console.log("Found refresh token, attempting silent refresh");
     const ok = await refreshToken();
     if (ok) { await loadData(); return; }
   }
+  console.log("No auth found, showing sign-in screen");
   show("auth-s");
 }
 
