@@ -6,39 +6,83 @@
 <title>Acadame — Trainer &amp; Broker Finder</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--navy:#1F3272;--navy2:#2B3F8A;--green:#16A34A;--gl:#F0FDF4;--pg:#EEF2F9;--cd:#FFFFFF;--br:#E2E8F0;--bs:#CBD5E1;--tx:#0F172A;--tm:#64748B;--tl:#94A3B8;--rd:#EF4444;--rl:#FEF2F2;--ra:12px;--rs:8px;--sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shm:0 4px 16px rgba(0,0,0,.10),0 2px 4px rgba(0,0,0,.05)}
+:root{--navy:#1F3272;--navy2:#2B3F8A;--green:#16A34A;--gl:#F0FDF4;--pg:#EEF2F9;--cd:#FFFFFF;--br:#E2E8F0;--bs:#CBD5E1;--tx:#0F172A;--tm:#64748B;--tl:#94A3B8;--rd:#EF4444;--rl:#FEF2F2;--am:#F59E0B;--al:#FFFBEB;--ra:12px;--rs:8px;--sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shm:0 4px 16px rgba(0,0,0,.10),0 2px 4px rgba(0,0,0,.05)}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--pg);color:var(--tx);min-height:100vh;font-size:15px}
 .hdr{background:var(--navy);padding:0 2rem;display:flex;align-items:center;gap:1.25rem;height:68px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .hdr img{height:40px}.hdv{width:1px;height:28px;background:rgba(255,255,255,.2)}
-.hdt{display:flex;flex-direction:column}.hdt .n{color:#fff;font-size:14px;font-weight:600}.hdt .s{color:rgba(255,255,255,.5);font-size:11px}
-.hdr-r{margin-left:auto;display:flex;align-items:center;gap:10px}
-.upill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);font-size:12px;font-weight:500;padding:5px 12px;border-radius:20px}
+.hdt .n{color:#fff;font-size:14px;font-weight:600}.hdt .s{color:rgba(255,255,255,.5);font-size:11px}
+.hdr-r{margin-left:auto}.upill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);font-size:12px;font-weight:500;padding:5px 12px;border-radius:20px}
 .tabs{background:var(--navy2);display:flex;padding:0 2rem}
 .tab{color:rgba(255,255,255,.6);font-size:13.5px;font-weight:600;padding:12px 20px;cursor:pointer;border-bottom:3px solid transparent;transition:all .15s}
 .tab:hover{color:rgba(255,255,255,.9)}.tab.active{color:#fff;border-bottom-color:#fff}
 .lay{max-width:1180px;margin:0 auto;padding:1.5rem}
 .sbar{background:var(--cd);border:1px solid var(--br);border-radius:var(--ra);box-shadow:var(--shm);padding:1.25rem 1.5rem;margin-bottom:1.25rem;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
-.sf{display:flex;flex-direction:column;gap:6px;flex:1;min-width:160px}
+.sf{display:flex;flex-direction:column;gap:6px;flex:1;min-width:150px}
 .sf label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tm)}
 .sw{position:relative}.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--tl);pointer-events:none}
 .inp{width:100%;padding:9px 12px 9px 32px;border:1px solid var(--bs);border-radius:var(--rs);font-size:14px;font-family:inherit;color:var(--tx);background:#fff;transition:border-color .15s,box-shadow .15s}
-.inp:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,50,114,.12)}
-select{padding:9px 12px;border:1px solid var(--bs);border-radius:var(--rs);font-size:14px;font-family:inherit;color:var(--tx);background:#fff;cursor:pointer;width:100%}
-select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,50,114,.12)}
+.inp:focus,.fsel:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,50,114,.12)}
+.fsel{padding:9px 12px;border:1px solid var(--bs);border-radius:var(--rs);font-size:14px;font-family:inherit;color:var(--tx);background:#fff;cursor:pointer;width:100%}
 .clr{padding:9px 16px;border-radius:var(--rs);border:1px solid var(--bs);background:none;color:var(--tm);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
 .clr:hover{background:var(--pg);color:var(--tx)}
-.rmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.rmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;gap:12px;flex-wrap:wrap}
 .rc{font-size:13px;color:var(--tm);font-weight:500}.rf{font-size:11px;color:var(--tl)}
+.sort-hint{font-size:11px;color:var(--am);font-weight:600;display:flex;align-items:center;gap:5px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem}
-.card{background:var(--cd);border:1px solid var(--br);border-radius:var(--ra);box-shadow:var(--sh);overflow:hidden;transition:box-shadow .15s,border-color .15s}
+
+/* ── Card base ── */
+.card{background:var(--cd);border:1px solid var(--br);border-radius:var(--ra);box-shadow:var(--sh);overflow:hidden;transition:box-shadow .15s,border-color .15s;position:relative}
 .card:hover{box-shadow:var(--shm);border-color:var(--bs)}
+
+/* ── Best pick highlight ── */
+.card.best-pick{border:2px solid #16A34A;box-shadow:0 0 0 3px rgba(22,163,74,.12),var(--shm)}
+.best-badge{position:absolute;top:10px;right:10px;background:#16A34A;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:4px;z-index:2}
+
+/* ── Inactive / not to be used overlay ── */
+.card.inactive{opacity:0.7}
+.card.inactive .ch,.card.inactive .cb{filter:grayscale(40%)}
+.inactive-banner{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  pointer-events:none;z-index:3;overflow:hidden;border-radius:var(--ra);
+}
+.inactive-banner::after{
+  content:"NOT TO BE USED";
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) rotate(-35deg);
+  font-size:18px;font-weight:900;
+  color:rgba(150,20,20,0.22);
+  letter-spacing:.12em;
+  white-space:nowrap;
+  pointer-events:none;
+  text-transform:uppercase;
+}
+.inactive-stripe{
+  position:absolute;top:0;right:0;
+  width:90px;height:90px;overflow:hidden;
+  pointer-events:none;z-index:4;
+}
+.inactive-stripe::before{
+  content:"NOT TO BE USED";
+  position:absolute;
+  top:22px;right:-28px;
+  width:130px;
+  background:rgba(180,30,30,0.75);
+  color:#fff;
+  font-size:9px;font-weight:700;
+  text-align:center;padding:3px 0;
+  transform:rotate(45deg);
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
 .ch{padding:1rem 1.25rem .75rem;border-bottom:1px solid var(--br);display:flex;align-items:flex-start;gap:10px}
 .av{width:38px;height:38px;border-radius:10px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:700;color:#fff}
 .av.assessor{background:#5B21B6}
 .cn{font-size:15px;font-weight:700;color:var(--tx);line-height:1.3}.cs{font-size:12px;color:var(--tm);margin-top:2px}
-.role-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
-.role-trainer{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
-.role-assessor{background:#F5F3FF;color:#5B21B6;border:1px solid #DDD6FE}
+.rbadge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
+.rb-t{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
+.rb-a{background:#F5F3FF;color:#5B21B6;border:1px solid #DDD6FE}
 .cb{padding:.875rem 1.25rem}
 .ctags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.875rem}
 .ct{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
@@ -47,13 +91,14 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 .dl{display:flex;flex-direction:column;gap:2px}
 .dlb{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--tl)}
 .dlv{font-size:13px;color:var(--tx);font-weight:500}.dlv.e{color:var(--tl);font-style:italic;font-weight:400}
+.price-highlight{color:#16A34A;font-weight:700}
 .dp{display:inline-block;background:var(--gl);color:#166534;border:1px solid #A7F3D0;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px}
 .cf{padding:.75rem 1.25rem;border-top:1px solid var(--br);background:#FAFBFD;display:flex;gap:8px}
 .cb2{flex:1;padding:7px 12px;border-radius:var(--rs);font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .15s;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px}
 .bp{background:#EFF6FF;color:#1E40AF}.bp:hover{background:#DBEAFE}
 .be{background:var(--gl);color:#166534}.be:hover{background:#DCFCE7}
 .bn{background:var(--pg);color:var(--tl);cursor:default}
-.bv{background:#FDF4FF;color:#6D28D9}.bv:hover{background:#F3E8FF}
+.bw{background:#F0F9FF;color:#0369A1;border:1px solid #BAE6FD}.bw:hover{background:#E0F2FE}
 .empty{text-align:center;padding:4rem 2rem;color:var(--tl);grid-column:1/-1}
 .empty h3{font-size:16px;color:var(--tm);font-weight:600;margin-bottom:6px}.empty p{font-size:13px}
 .state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:12px;color:var(--tm);font-size:14px}
@@ -63,9 +108,9 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 .auth-s{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 68px)}
 .auth-c{background:var(--cd);border:1px solid var(--br);border-radius:var(--ra);box-shadow:var(--shm);padding:2.5rem;text-align:center;max-width:420px;width:90%}
 .auth-c img{height:48px;margin-bottom:1.5rem}
-.auth-c h2{font-size:20px;font-weight:700;color:var(--tx);margin-bottom:8px}
+.auth-c h2{font-size:20px;font-weight:700;margin-bottom:8px}
 .auth-c p{font-size:14px;color:var(--tm);line-height:1.6;margin-bottom:1.5rem}
-.auth-btn{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;border:none;border-radius:var(--rs);padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s}
+.auth-btn{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;border:none;border-radius:var(--rs);padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
 .auth-btn:hover{background:var(--navy2)}
 @media(max-width:640px){.lay{padding:1rem}.hdr{padding:0 1rem}.tabs{padding:0 1rem}.sbar{flex-direction:column}.grid{grid-template-columns:1fr}}
 </style>
@@ -104,7 +149,7 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
     <div class="lay">
       <div class="sbar">
         <div class="sf" style="flex:2"><label>Keyword search</label><div class="sw"><svg class="si" width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input class="inp" type="text" id="tq" placeholder="name, course, keyword…" oninput="renderT()"></div></div>
-        <div class="sf"><label>Course</label><select id="tc" onchange="renderT()"><option value="">All courses</option><option value="ADR">ADR</option>
+        <div class="sf"><label>Course</label><select class="fsel" id="tc" onchange="renderT()"><option value="">All courses</option><option value="ADR">ADR</option>
 <option value="Abrasive Wheels">Abrasive Wheels</option>
 <option value="Asbestos">Asbestos</option>
 <option value="CAT & GENNY">CAT & GENNY</option>
@@ -151,7 +196,7 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 <option value="Vehicle Banksman">Vehicle Banksman</option>
 <option value="Water Hygiene">Water Hygiene</option>
 <option value="Working at height">Working at height</option></select></div>
-        <div class="sf"><label>Region</label><select id="tr" onchange="renderT()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
+        <div class="sf"><label>Region</label><select class="fsel" id="tr" onchange="renderT()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
 <option value="East of England">East of England</option>
 <option value="London">London</option>
 <option value="North East England">North East England</option>
@@ -164,11 +209,19 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 <option value="West Midlands">West Midlands</option>
 <option value="Yorkshire & Humber">Yorkshire & Humber</option>
 <option value="Nationwide / Remote">Nationwide / Remote</option></select></div>
-        <div class="sf"><label>Virtual</label><select id="tv" onchange="renderT()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
-        <div class="sf"><label>Role</label><select id="tro" onchange="renderT()"><option value="">All</option><option value="trainer">Trainer</option><option value="assessor">Assessor</option></select></div>
+        <div class="sf"><label>Virtual</label><select class="fsel" id="tv" onchange="renderT()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
+        <div class="sf"><label>Role</label><select class="fsel" id="tro" onchange="renderT()"><option value="">All</option><option value="trainer">Trainer</option><option value="assessor">Assessor</option></select></div>
+        <div class="sf"><label>Show inactive</label><select class="fsel" id="tac" onchange="renderT()"><option value="active">Active only</option><option value="all">Show all</option></select></div>
         <div class="sf" style="flex:0"><label>&nbsp;</label><button class="clr" onclick="clearT()">Clear</button></div>
       </div>
-      <div class="rmeta"><span class="rc" id="tc2"></span><span class="rf" id="tf"></span></div>
+      <div class="rmeta">
+        <span class="rc" id="tc2"></span>
+        <span class="sort-hint" id="t-sort-hint" style="display:none">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M2 7l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sorted cheapest first · Best pick highlighted
+        </span>
+        <span class="rf" id="tf"></span>
+      </div>
       <div class="grid" id="tg"></div>
     </div>
   </div>
@@ -176,7 +229,7 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
     <div class="lay">
       <div class="sbar">
         <div class="sf" style="flex:2"><label>Keyword search</label><div class="sw"><svg class="si" width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input class="inp" type="text" id="pq" placeholder="company name, course, keyword…" oninput="renderP()"></div></div>
-        <div class="sf"><label>Course</label><select id="pc" onchange="renderP()"><option value="">All courses</option><option value="18th Edition">18th Edition</option>
+        <div class="sf"><label>Course</label><select class="fsel" id="pc" onchange="renderP()"><option value="">All courses</option><option value="18th Edition">18th Edition</option>
 <option value="ADR">ADR</option>
 <option value="ALLMI Operator Lorry Loader Course">ALLMI Operator Lorry Loader Course</option>
 <option value="ALLMI Slinger / Signaller">ALLMI Slinger / Signaller</option>
@@ -217,7 +270,7 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 <option value="Vehicle Banksman">Vehicle Banksman</option>
 <option value="Water Jetting">Water Jetting</option>
 <option value="Working at height">Working at height</option></select></div>
-        <div class="sf"><label>Region</label><select id="pr" onchange="renderP()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
+        <div class="sf"><label>Region</label><select class="fsel" id="pr" onchange="renderP()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
 <option value="East of England">East of England</option>
 <option value="London">London</option>
 <option value="North East England">North East England</option>
@@ -230,7 +283,8 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 <option value="West Midlands">West Midlands</option>
 <option value="Yorkshire & Humber">Yorkshire & Humber</option>
 <option value="Nationwide / Remote">Nationwide / Remote</option></select></div>
-        <div class="sf"><label>Virtual</label><select id="pv" onchange="renderP()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
+        <div class="sf"><label>Virtual</label><select class="fsel" id="pv" onchange="renderP()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
+        <div class="sf"><label>Show inactive</label><select class="fsel" id="pac" onchange="renderP()"><option value="active">Active only</option><option value="all">Show all</option></select></div>
         <div class="sf" style="flex:0"><label>&nbsp;</label><button class="clr" onclick="clearP()">Clear</button></div>
       </div>
       <div class="rmeta"><span class="rc" id="pc2"></span><span class="rf" id="pf"></span></div>
@@ -240,28 +294,27 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 </div>
 
 <script>
-const CLIENT_ID="8c726285-27a0-417a-97f4-18e7bc2fae1a", TENANT_ID="a88bd07b-c574-4fea-b28b-31e5482fca8e";
-const TENANT="acadame.sharepoint.com", SITE="Sales94", LIBRARY="Shared Documents", FOLDER="Sales Tool Data", FILE="acadame-database.xlsx";
+const CLIENT_ID="8c726285-27a0-417a-97f4-18e7bc2fae1a",TENANT_ID="a88bd07b-c574-4fea-b28b-31e5482fca8e";
+const TENANT="acadame.sharepoint.com",SITE="Sales94",LIBRARY="Shared Documents";
+const FOLDER="Sales Tool Data",FILE="acadame-database.xlsx";
 const REDIRECT="https://acadame-training.github.io/sales-tools/acadame-finder.html";
 const SCOPES=["Files.Read","Sites.Read.All","User.Read"];
 const AUTH_BASE=`https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0`;
 
-let accessToken=null, trainers=[], partners=[], loadedAt=null;
+let accessToken=null,trainers=[],partners=[],loadedAt=null;
 const el=id=>document.getElementById(id);
 
 function show(id){
-  ["auth-s","loading-s","error-s","main"].forEach(s=>{
-    el(s).style.display=s===id?(id==="auth-s"?"flex":"block"):"none";
-  });
+  ["auth-s","loading-s","error-s","main"].forEach(s=>el(s).style.display=s===id?(id==="auth-s"?"flex":"block"):"none");
   el("tabs").style.display=id==="main"?"flex":"none";
 }
 
 function b64url(buf){return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,"")}
 
 async function generatePKCE(){
-  const verifier=b64url(crypto.getRandomValues(new Uint8Array(32)));
-  const hash=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(verifier));
-  return{verifier,challenge:b64url(hash)};
+  const v=b64url(crypto.getRandomValues(new Uint8Array(32)));
+  const h=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v));
+  return{verifier:v,challenge:b64url(h)};
 }
 
 async function doSignIn(){
@@ -269,9 +322,9 @@ async function doSignIn(){
   const state=b64url(crypto.getRandomValues(new Uint8Array(16)));
   sessionStorage.setItem("pkce_verifier",verifier);
   sessionStorage.setItem("pkce_state",state);
-  const p=new URLSearchParams({client_id:CLIENT_ID,response_type:"code",
-    redirect_uri:REDIRECT,scope:SCOPES.join(" ")+" offline_access",
-    code_challenge:challenge,code_challenge_method:"S256",state,response_mode:"query"});
+  const p=new URLSearchParams({client_id:CLIENT_ID,response_type:"code",redirect_uri:REDIRECT,
+    scope:SCOPES.join(" ")+" offline_access",code_challenge:challenge,
+    code_challenge_method:"S256",state,response_mode:"query"});
   window.location.href=`${AUTH_BASE}/authorize?${p}`;
 }
 
@@ -280,13 +333,11 @@ async function handleCallback(){
   const code=params.get("code"),state=params.get("state"),error=params.get("error");
   if(error){showErr("Sign-in error: "+(params.get("error_description")||error));return false;}
   if(!code)return false;
-  const savedState=sessionStorage.getItem("pkce_state");
-  const verifier=sessionStorage.getItem("pkce_verifier");
-  if(state!==savedState){showErr("Session expired — please try signing in again.");return false;}
-  show("loading-s"); el("load-msg").textContent="Completing sign-in…";
+  if(state!==sessionStorage.getItem("pkce_state")){showErr("Session expired — please sign in again.");return false;}
+  show("loading-s");el("load-msg").textContent="Completing sign-in…";
   try{
     const body=new URLSearchParams({client_id:CLIENT_ID,grant_type:"authorization_code",
-      code,redirect_uri:REDIRECT,code_verifier:verifier});
+      code,redirect_uri:REDIRECT,code_verifier:sessionStorage.getItem("pkce_verifier")});
     const res=await fetch(`${AUTH_BASE}/token`,{method:"POST",
       headers:{"Content-Type":"application/x-www-form-urlencoded"},body:body.toString()});
     const data=await res.json();
@@ -294,18 +345,18 @@ async function handleCallback(){
     accessToken=data.access_token;
     if(data.refresh_token)sessionStorage.setItem("refresh_token",data.refresh_token);
     try{
-      const payload=JSON.parse(atob(data.id_token.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));
-      el("upill").textContent=payload.name||payload.preferred_username||"";
+      const pl=JSON.parse(atob(data.id_token.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));
+      el("upill").textContent=pl.name||pl.preferred_username||"";
       el("upill").style.display="inline-block";
     }catch(e){}
-    window.history.replaceState({}, "", REDIRECT);
-    sessionStorage.removeItem("pkce_verifier"); sessionStorage.removeItem("pkce_state");
+    window.history.replaceState({}, "",REDIRECT);
+    sessionStorage.removeItem("pkce_verifier");sessionStorage.removeItem("pkce_state");
     return true;
   }catch(e){showErr("Sign-in failed: "+e.message);return false;}
 }
 
 async function refreshToken(){
-  const rt=sessionStorage.getItem("refresh_token"); if(!rt)return false;
+  const rt=sessionStorage.getItem("refresh_token");if(!rt)return false;
   try{
     const body=new URLSearchParams({client_id:CLIENT_ID,grant_type:"refresh_token",
       refresh_token:rt,scope:SCOPES.join(" ")+" offline_access"});
@@ -331,122 +382,186 @@ async function loadData(){
   try{
     el("load-msg").textContent="Connecting to SharePoint…";
     const site=await graph(`/sites/${TENANT}:/sites/${SITE}`);
-    el("load-msg").textContent="Locating document library…";
     const drives=await graph(`/sites/${site.id}/drives`);
     const drive=drives.value.find(d=>d.name===LIBRARY||d.name==="Documents");
-    if(!drive)throw new Error(`Library "${LIBRARY}" not found. Found: ${drives.value.map(d=>d.name).join(", ")}`);
+    if(!drive)throw new Error(`Library not found. Found: ${drives.value.map(d=>d.name).join(", ")}`);
     el("load-msg").textContent="Loading Excel file…";
     const file=await graph(`/drives/${drive.id}/root:/${FOLDER}/${FILE}`);
-    el("load-msg").textContent="Reading trainer data…";
+    el("load-msg").textContent="Reading data…";
     const tRows=await graph(`/drives/${drive.id}/items/${file.id}/workbook/worksheets/Trainer Search/usedRange`);
-    el("load-msg").textContent="Reading broker data…";
     const pRows=await graph(`/drives/${drive.id}/items/${file.id}/workbook/worksheets/Broker & Partner Search/usedRange`);
     trainers=parseSheet(tRows,"trainer");
     partners=parseSheet(pRows,"partner");
     loadedAt=new Date();
     el("hdr-s").textContent="Updated "+loadedAt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
-    show("main"); renderT(); renderP();
+    show("main");renderT();renderP();
   }catch(e){showErr(e.message);}
 }
 
 function parseSheet(r,type){
-  const rows=r.values; if(!rows||rows.length<9)return[];
+  const rows=r.values;if(!rows||rows.length<9)return[];
   const hdrs=rows[7].map(h=>String(h||"").trim().toLowerCase());
   const out=[];
   for(let i=8;i<rows.length;i++){
-    const row=rows[i]; if(!row[0]||!String(row[0]).trim())continue;
-    const o={}; hdrs.forEach((h,ci)=>{o[h]=String(row[ci]??"").trim()||""});
-    if(type==="trainer")out.push({name:o.name,role:o.role||"trainer",phone:o.phone,email:o.email,
+    const row=rows[i];if(!row[0]||!String(row[0]).trim())continue;
+    const o={};hdrs.forEach((h,ci)=>{o[h]=String(row[ci]??"").trim()||""});
+    if(type==="trainer")out.push({
+      name:o.name,role:(o.role||"trainer").toLowerCase(),phone:o.phone,email:o.email,
       courses:(o["courses / qualifications"]||o["courses delivered"]||"").split(",").map(s=>s.trim()).filter(Boolean),
       area:o["region / area"]||"",dailyRate:o["day rate"]||"",halfDayRate:o["half day"]||"",
-      mileage:o.mileage||"",paymentTerms:o["payment terms"]||"",virtualDelivery:o["virtual?"]||""});
-    else out.push({name:o["company name"]||o.name,phone:o.phone,email:o.email,discount:o.discount,
+      mileage:o.mileage||"",paymentTerms:o["payment terms"]||"",
+      virtualDelivery:o["virtual?"]||"",active:(o.active||"Yes").toLowerCase()!=="no"
+    });
+    else out.push({
+      name:o["company name"]||o.name,phone:o.phone,email:o.email,discount:o.discount,
       courses:(o["courses offered"]||"").split(",").map(s=>s.trim()).filter(Boolean),
-      area:o["region / area"]||"",virtualDelivery:o["virtual?"]||"",paymentTerms:o["payment terms"]||""});
+      area:o["region / area"]||"",virtualDelivery:o["virtual?"]||"",
+      paymentTerms:o["payment terms"]||"",active:(o.active||"Yes").toLowerCase()!=="no",
+      website:o.website||""
+    });
   }
   return out;
 }
 
 function showErr(msg){el("err-msg").innerHTML="<strong>Something went wrong</strong><br>"+msg;show("error-s");}
-
 function initials(n){return(n||"?").split(" ").slice(0,2).map(w=>w[0]||"").join("").toUpperCase()}
-function hl(t,q){if(!q||!t)return t||"";const re=new RegExp("("+q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","gi");return String(t).replace(re,"<mark style='background:#FEF08A;border-radius:2px;padding:0 1px'>$1</mark>")}
-
-// Phone: use Webex protocol, fallback to tel:
-function phoneBtn(phone, q){
-  if(!phone)return'<span class="cb2 bn">No phone</span>';
-  const display=hl(phone,q);
-  // Webex uses callto: or webextel: protocol; fallback tel: works too
-  return`<a class="cb2 bp" href="callto:${phone}" title="Call via Webex"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 0 1 1-1h2.5a1 1 0 0 1 .96.72l.8 2.8a1 1 0 0 1-.29 1.02L5.7 7.56C6.9 9.9 8.1 11.1 10.42 12.29l1.02-1.31a1 1 0 0 1 1.02-.29l2.8.8A1 1 0 0 1 16 12.5V15a1 1 0 0 1-1 1C6.16 16 0 9.84 0 2a1 1 0 0 1 1-1h1Z" fill="currentColor"/></svg>${display}</a>`;
+function hl(t,q){
+  if(!q||!t)return t||"";
+  const re=new RegExp("("+q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","gi");
+  return String(t).replace(re,"<mark style='background:#FEF08A;border-radius:2px;padding:0 1px'>$1</mark>");
 }
 
-// Email: use mailto: which Outlook intercepts as default mail client
+function parseRate(r){
+  if(!r)return null;
+  const n=parseFloat(String(r).replace(/[^0-9.]/g,""));
+  return isNaN(n)?null:n;
+}
+
+function phoneBtn(phone,q){
+  if(!phone)return'<span class="cb2 bn">No phone</span>';
+  return`<a class="cb2 bp" href="callto:${phone}" title="Call via Webex">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 0 1 1-1h2.5a1 1 0 0 1 .96.72l.8 2.8a1 1 0 0 1-.29 1.02L5.7 7.56C6.9 9.9 8.1 11.1 10.42 12.29l1.02-1.31a1 1 0 0 1 1.02-.29l2.8.8A1 1 0 0 1 16 12.5V15a1 1 0 0 1-1 1C6.16 16 0 9.84 0 2a1 1 0 0 1 1-1h1Z" fill="currentColor"/></svg>
+    ${hl(phone,q)}</a>`;
+}
 function emailBtn(email){
   if(!email)return'<span class="cb2 bn">No email</span>';
-  return`<a class="cb2 be" href="mailto:${email}" title="Open in Outlook"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M1 3h14v10H1V3Zm0 0l7 6 7-6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Email</a>`;
+  return`<a class="cb2 be" href="mailto:${email}" title="Open in Outlook">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M1 3h14v10H1V3Zm0 0l7 6 7-6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Email</a>`;
+}
+function websiteBtn(url){
+  if(!url)return'';
+  const display=url.replace(/^https?:\/\//,'').replace(/\/.*/,'');
+  return`<a class="cb2 bw" href="${url}" target="_blank" rel="noopener" title="Open website">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 1.5c-2 2-2 9 0 11M8 1.5c2 2 2 9 0 11M1.5 8h13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    Website</a>`;
+}
+
+function inactiveBanner(){
+  return`<div class="inactive-banner"></div><div class="inactive-stripe"></div>`;
 }
 
 function renderT(){
   const q=el("tq").value.trim().toLowerCase(),cf=el("tc").value,
-        rf=el("tr").value,vf=el("tv").value.toLowerCase(),rof=el("tro").value.toLowerCase();
-  const res=trainers.filter(t=>{
-    const mq=!q||[t.name,t.role,...t.courses,t.area,t.phone,t.email,t.dailyRate,t.paymentTerms].join(" ").toLowerCase().includes(q);
+        rf=el("tr").value,vf=el("tv").value.toLowerCase(),
+        rof=el("tro").value.toLowerCase(),showInactive=el("tac").value==="all";
+
+  let res=trainers.filter(t=>{
+    if(!showInactive && !t.active)return false;
+    const mq=!q||[t.name,t.role,...t.courses,t.area,t.phone,t.email].join(" ").toLowerCase().includes(q);
     const mc=!cf||t.courses.includes(cf);
     const mr=!rf||(t.area||"").toLowerCase().includes(rf.toLowerCase());
     const mv=!vf||(t.virtualDelivery||"").toLowerCase().includes(vf);
-    const mro=!rof||(t.role||"trainer").toLowerCase()===rof;
+    const mro=!rof||t.role===rof;
     return mq&&mc&&mr&&mv&&mro;
   });
+
+  // Sort: active cheapest first, then active no-rate, then inactive
+  res.sort((a,b)=>{
+    if(a.active!==b.active)return a.active?-1:1;
+    const ra=parseRate(a.dailyRate),rb=parseRate(b.dailyRate);
+    if(ra!==null&&rb!==null)return ra-rb;
+    if(ra!==null)return -1;
+    if(rb!==null)return 1;
+    return 0;
+  });
+
+  // Best pick = cheapest active with a rate
+  const bestPick=res.find(t=>t.active&&parseRate(t.dailyRate)!==null);
+  const hasPrices=res.some(t=>t.active&&parseRate(t.dailyRate)!==null);
+
   el("tc2").textContent=res.length+" record"+(res.length!==1?"s":"")+" found";
+  el("t-sort-hint").style.display=hasPrices?"flex":"none";
   el("tf").textContent=loadedAt?"Loaded "+loadedAt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):"";
-  if(!res.length){el("tg").innerHTML='<div class="empty"><h3>No records found</h3><p>Try a different keyword or remove a filter</p></div>';return;}
+
+  if(!res.length){el("tg").innerHTML='<div class="empty"><h3>No records found</h3><p>Try a different search or adjust your filters</p></div>';return;}
+
   el("tg").innerHTML=res.map(t=>{
-    const role=(t.role||"trainer").toLowerCase();
-    const isAssessor=role==="assessor";
+    const isAssessor=t.role==="assessor";
+    const isBest=bestPick&&t===bestPick;
+    const rate=parseRate(t.dailyRate);
+    const rateStr=[t.dailyRate&&`Day: £${rate||t.dailyRate}`,t.halfDayRate&&`Half: £${t.halfDayRate}`].filter(Boolean).join(" · ")||null;
     const tags=t.courses.map(c=>`<span class="ct ${cf===c?"hl":""}">${hl(c,q)}</span>`).join("");
-    const rate=[t.dailyRate&&`Day: ${t.dailyRate}`,t.halfDayRate&&`Half: ${t.halfDayRate}`].filter(Boolean).join(" · ")||null;
-    const virt=t.virtualDelivery?`<div class="cs" style="color:#16A34A;font-size:11px">&#10003; Virtual delivery</div>`:"";
-    return`<div class="card"><div class="ch">
-      <div class="av ${isAssessor?"assessor":""}">${initials(t.name)}</div>
-      <div><div class="cn">${hl(t.name,q)}</div>
-      <span class="role-badge ${isAssessor?"role-assessor":"role-trainer"}">${isAssessor?"Assessor":"Trainer"}</span>
-      ${t.area?`<div class="cs">${hl(t.area,q)}</div>`:""}</div></div>
-      <div class="cb"><div class="ctags">${tags||'<span style="font-size:12px;color:var(--tl)">No courses listed</span>'}</div>
-      <div class="dg">
-        <div class="dl"><span class="dlb">Rate</span><span class="dlv ${rate?"":"e"}">${rate||"Not listed"}</span></div>
-        <div class="dl"><span class="dlb">Mileage</span><span class="dlv ${t.mileage?"":"e"}">${t.mileage||"Not listed"}</span></div>
-        <div class="dl"><span class="dlb">Payment</span><span class="dlv ${t.paymentTerms?"":"e"}">${t.paymentTerms||"Not listed"}</span></div>
-        <div class="dl"><span class="dlb">Virtual</span><span class="dlv ${t.virtualDelivery?"":"e"}">${t.virtualDelivery||"Not listed"}</span></div>
-      </div></div>
-      <div class="cf">${phoneBtn(t.phone,q)}${emailBtn(t.email)}</div></div>`;
+
+    return`<div class="card${isBest?" best-pick":""}${!t.active?" inactive":""}">
+      ${isBest?`<div class="best-badge"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1l1.2 2.4L9 3.8 7 5.7l.5 2.8L5 7.2 2.5 8.5 3 5.7 1 3.8l2.8-.4L5 1Z" fill="white"/></svg>Best pick</div>`:""}
+      ${!t.active?inactiveBanner():""}
+      <div class="ch">
+        <div class="av${isAssessor?" assessor":""}">${initials(t.name)}</div>
+        <div><div class="cn">${hl(t.name,q)}</div>
+        <span class="rbadge ${isAssessor?"rb-a":"rb-t"}">${isAssessor?"Assessor":"Trainer"}</span>
+        ${t.area?`<div class="cs">${hl(t.area,q)}</div>`:""}</div>
+      </div>
+      <div class="cb">
+        <div class="ctags">${tags||'<span style="font-size:12px;color:var(--tl)">No courses listed</span>'}</div>
+        <div class="dg">
+          <div class="dl"><span class="dlb">Rate</span><span class="dlv${rateStr?isBest?" price-highlight":"":" e"}">${rateStr||"Not listed"}</span></div>
+          <div class="dl"><span class="dlb">Mileage</span><span class="dlv ${t.mileage?"":"e"}">${t.mileage||"Not listed"}</span></div>
+          <div class="dl"><span class="dlb">Payment</span><span class="dlv ${t.paymentTerms?"":"e"}">${t.paymentTerms||"Not listed"}</span></div>
+          <div class="dl"><span class="dlb">Virtual</span><span class="dlv ${t.virtualDelivery?"":"e"}">${t.virtualDelivery||"Not listed"}</span></div>
+        </div>
+      </div>
+      <div class="cf">${phoneBtn(t.phone,q)}${emailBtn(t.email)}</div>
+    </div>`;
   }).join("");
 }
 
 function renderP(){
   const q=el("pq").value.trim().toLowerCase(),cf=el("pc").value,
-        rf=el("pr").value,vf=el("pv").value.toLowerCase();
-  const res=partners.filter(p=>{
+        rf=el("pr").value,vf=el("pv").value.toLowerCase(),
+        showInactive=el("pac").value==="all";
+
+  let res=partners.filter(p=>{
+    if(!showInactive&&!p.active)return false;
     const mq=!q||[p.name,...p.courses,p.phone,p.email,p.discount,p.area].join(" ").toLowerCase().includes(q);
     const mc=!cf||p.courses.includes(cf);
     const mr=!rf||(p.area||"").toLowerCase().includes(rf.toLowerCase());
     const mv=!vf||(p.virtualDelivery||"").toLowerCase().includes(vf);
     return mq&&mc&&mr&&mv;
   });
+
   el("pc2").textContent=res.length+" partner"+(res.length!==1?"s":"")+" found";
   el("pf").textContent=loadedAt?"Loaded "+loadedAt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):"";
-  if(!res.length){el("pg").innerHTML='<div class="empty"><h3>No partners found</h3><p>Try a different keyword or remove a filter</p></div>';return;}
+
+  if(!res.length){el("pg").innerHTML='<div class="empty"><h3>No partners found</h3><p>Try a different search or adjust your filters</p></div>';return;}
+
   el("pg").innerHTML=res.map(p=>{
     const tags=p.courses.map(c=>`<span class="ct ${cf===c?"hl":""}">${hl(c,q)}</span>`).join("");
-    return`<div class="card"><div class="ch"><div class="av">${initials(p.name)}</div>
-      <div style="flex:1;min-width:0"><div class="cn">${hl(p.name,q)}</div>
-      ${p.discount?`<div class="cs" style="margin-top:4px"><span class="dp">&#9660; ${p.discount} discount</span></div>`:""}
-      ${p.area?`<div class="cs">${hl(p.area,q)}</div>`:""}</div></div>
+    return`<div class="card${!p.active?" inactive":""}">
+      ${!p.active?inactiveBanner():""}
+      <div class="ch"><div class="av">${initials(p.name)}</div>
+        <div style="flex:1;min-width:0"><div class="cn">${hl(p.name,q)}</div>
+        ${p.discount?`<div class="cs" style="margin-top:4px"><span class="dp">&#9660; ${p.discount} discount</span></div>`:""}
+        ${p.area?`<div class="cs">${hl(p.area,q)}</div>`:""}</div>
+      </div>
       <div class="cb"><div class="ctags">${tags||'<span style="font-size:12px;color:var(--tl)">No courses listed</span>'}</div>
-      <div class="dg">
-        <div class="dl"><span class="dlb">Virtual</span><span class="dlv ${p.virtualDelivery?"":"e"}">${p.virtualDelivery||"Not listed"}</span></div>
-        <div class="dl"><span class="dlb">Payment</span><span class="dlv ${p.paymentTerms?"":"e"}">${p.paymentTerms||"Not listed"}</span></div>
-      </div></div>
-      <div class="cf">${phoneBtn(p.phone,q)}${emailBtn(p.email)}</div></div>`;
+        <div class="dg">
+          <div class="dl"><span class="dlb">Virtual</span><span class="dlv ${p.virtualDelivery?"":"e"}">${p.virtualDelivery||"Not listed"}</span></div>
+          <div class="dl"><span class="dlb">Payment</span><span class="dlv ${p.paymentTerms?"":"e"}">${p.paymentTerms||"Not listed"}</span></div>
+        </div>
+      </div>
+      <div class="cf">${phoneBtn(p.phone,q)}${emailBtn(p.email)}</div>
+    </div>`;
   }).join("");
 }
 
@@ -456,15 +571,15 @@ function showTab(t){
   el("tab-t").classList.toggle("active",t==="t");
   el("tab-p").classList.toggle("active",t==="p");
 }
-function clearT(){el("tq").value="";el("tc").value="";el("tr").value="";el("tv").value="";el("tro").value="";renderT();}
-function clearP(){el("pq").value="";el("pc").value="";el("pr").value="";el("pv").value="";renderP();}
+function clearT(){el("tq").value="";el("tc").value="";el("tr").value="";el("tv").value="";el("tro").value="";el("tac").value="active";renderT();}
+function clearP(){el("pq").value="";el("pc").value="";el("pr").value="";el("pv").value="";el("pac").value="active";renderP();}
 
 async function init(){
   if(window.location.search.includes("code=")||window.location.search.includes("error=")){
-    const ok=await handleCallback(); if(ok){await loadData();return;} return;
+    const ok=await handleCallback();if(ok){await loadData();return;}return;
   }
   if(sessionStorage.getItem("refresh_token")){
-    const ok=await refreshToken(); if(ok){await loadData();return;}
+    const ok=await refreshToken();if(ok){await loadData();return;}
   }
   show("auth-s");
 }
