@@ -6,11 +6,10 @@
 <title>Acadame — Trainer &amp; Broker Finder</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--navy:#1F3272;--navy2:#2B3F8A;--green:#16A34A;--gl:#F0FDF4;--am:#F59E0B;--al:#FFFBEB;--rd:#EF4444;--rl:#FEF2F2;--pg:#EEF2F9;--cd:#FFFFFF;--br:#E2E8F0;--bs:#CBD5E1;--tx:#0F172A;--tm:#64748B;--tl:#94A3B8;--ra:12px;--rs:8px;--sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shm:0 4px 16px rgba(0,0,0,.10),0 2px 4px rgba(0,0,0,.05)}
+:root{--navy:#1F3272;--navy2:#2B3F8A;--green:#16A34A;--gl:#F0FDF4;--pg:#EEF2F9;--cd:#FFFFFF;--br:#E2E8F0;--bs:#CBD5E1;--tx:#0F172A;--tm:#64748B;--tl:#94A3B8;--rd:#EF4444;--rl:#FEF2F2;--ra:12px;--rs:8px;--sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shm:0 4px 16px rgba(0,0,0,.10),0 2px 4px rgba(0,0,0,.05)}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--pg);color:var(--tx);min-height:100vh;font-size:15px}
 .hdr{background:var(--navy);padding:0 2rem;display:flex;align-items:center;gap:1.25rem;height:68px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.hdr img{height:40px}
-.hdv{width:1px;height:28px;background:rgba(255,255,255,.2)}
+.hdr img{height:40px}.hdv{width:1px;height:28px;background:rgba(255,255,255,.2)}
 .hdt{display:flex;flex-direction:column}.hdt .n{color:#fff;font-size:14px;font-weight:600}.hdt .s{color:rgba(255,255,255,.5);font-size:11px}
 .hdr-r{margin-left:auto;display:flex;align-items:center;gap:10px}
 .upill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);font-size:12px;font-weight:500;padding:5px 12px;border-radius:20px}
@@ -19,12 +18,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .tab:hover{color:rgba(255,255,255,.9)}.tab.active{color:#fff;border-bottom-color:#fff}
 .lay{max-width:1180px;margin:0 auto;padding:1.5rem}
 .sbar{background:var(--cd);border:1px solid var(--br);border-radius:var(--ra);box-shadow:var(--shm);padding:1.25rem 1.5rem;margin-bottom:1.25rem;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
-.sf{display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px}
+.sf{display:flex;flex-direction:column;gap:6px;flex:1;min-width:160px}
 .sf label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tm)}
 .sw{position:relative}.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--tl);pointer-events:none}
 .inp{width:100%;padding:9px 12px 9px 32px;border:1px solid var(--bs);border-radius:var(--rs);font-size:14px;font-family:inherit;color:var(--tx);background:#fff;transition:border-color .15s,box-shadow .15s}
 .inp:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,50,114,.12)}
-select{padding:9px 12px;border:1px solid var(--bs);border-radius:var(--rs);font-size:14px;font-family:inherit;color:var(--tx);background:#fff;cursor:pointer;min-width:190px}
+select{padding:9px 12px;border:1px solid var(--bs);border-radius:var(--rs);font-size:14px;font-family:inherit;color:var(--tx);background:#fff;cursor:pointer;width:100%}
 select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,50,114,.12)}
 .clr{padding:9px 16px;border-radius:var(--rs);border:1px solid var(--bs);background:none;color:var(--tm);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
 .clr:hover{background:var(--pg);color:var(--tx)}
@@ -35,7 +34,11 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 .card:hover{box-shadow:var(--shm);border-color:var(--bs)}
 .ch{padding:1rem 1.25rem .75rem;border-bottom:1px solid var(--br);display:flex;align-items:flex-start;gap:10px}
 .av{width:38px;height:38px;border-radius:10px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:700;color:#fff}
+.av.assessor{background:#5B21B6}
 .cn{font-size:15px;font-weight:700;color:var(--tx);line-height:1.3}.cs{font-size:12px;color:var(--tm);margin-top:2px}
+.role-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
+.role-trainer{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
+.role-assessor{background:#F5F3FF;color:#5B21B6;border:1px solid #DDD6FE}
 .cb{padding:.875rem 1.25rem}
 .ctags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.875rem}
 .ct{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
@@ -50,13 +53,13 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 .bp{background:#EFF6FF;color:#1E40AF}.bp:hover{background:#DBEAFE}
 .be{background:var(--gl);color:#166534}.be:hover{background:#DCFCE7}
 .bn{background:var(--pg);color:var(--tl);cursor:default}
+.bv{background:#FDF4FF;color:#6D28D9}.bv:hover{background:#F3E8FF}
 .empty{text-align:center;padding:4rem 2rem;color:var(--tl);grid-column:1/-1}
 .empty h3{font-size:16px;color:var(--tm);font-weight:600;margin-bottom:6px}.empty p{font-size:13px}
 .state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:12px;color:var(--tm);font-size:14px}
 .spin{width:32px;height:32px;border:3px solid var(--br);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .err{background:var(--rl);border:1px solid #FECACA;border-radius:var(--ra);padding:1rem 1.25rem;font-size:13px;color:var(--rd);max-width:520px;text-align:center;line-height:1.6}
-.err a{color:var(--rd);font-weight:600}
 .auth-s{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 68px)}
 .auth-c{background:var(--cd);border:1px solid var(--br);border-radius:var(--ra);box-shadow:var(--shm);padding:2.5rem;text-align:center;max-width:420px;width:90%}
 .auth-c img{height:48px;margin-bottom:1.5rem}
@@ -77,7 +80,7 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 </header>
 
 <div class="tabs" id="tabs" style="display:none">
-  <div class="tab active" onclick="showTab('t')" id="tab-t">Trainer Search</div>
+  <div class="tab active" onclick="showTab('t')" id="tab-t">Trainer &amp; Assessor Search</div>
   <div class="tab" onclick="showTab('p')" id="tab-p">Broker &amp; Partner Search</div>
 </div>
 
@@ -100,7 +103,7 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
   <div id="v-t">
     <div class="lay">
       <div class="sbar">
-        <div class="sf" style="flex:2"><label>Keyword search</label><div class="sw"><svg class="si" width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input class="inp" type="text" id="tq" placeholder="glass, iosh, first aid, name…" oninput="renderT()"></div></div>
+        <div class="sf" style="flex:2"><label>Keyword search</label><div class="sw"><svg class="si" width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input class="inp" type="text" id="tq" placeholder="name, course, keyword…" oninput="renderT()"></div></div>
         <div class="sf"><label>Course</label><select id="tc" onchange="renderT()"><option value="">All courses</option><option value="ADR">ADR</option>
 <option value="Abrasive Wheels">Abrasive Wheels</option>
 <option value="Asbestos">Asbestos</option>
@@ -116,6 +119,7 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 <option value="Evac Chair">Evac Chair</option>
 <option value="FLT">FLT</option>
 <option value="Face Fit">Face Fit</option>
+<option value="Fenestration NVQ's">Fenestration NVQ's</option>
 <option value="Fire Marshal">Fire Marshal</option>
 <option value="First Aid">First Aid</option>
 <option value="Food Safety">Food Safety</option>
@@ -127,12 +131,19 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 <option value="Legionella">Legionella</option>
 <option value="Lift Entrapment">Lift Entrapment</option>
 <option value="Lift Passenger release Training">Lift Passenger release Training</option>
+<option value="Lifting NVQ's">Lifting NVQ's</option>
 <option value="Manual Handling">Manual Handling</option>
 <option value="Mental Health">Mental Health</option>
 <option value="NPORS">NPORS</option>
+<option value="NVQ Assessor">NVQ Assessor</option>
+<option value="NVQ Carpentry">NVQ Carpentry</option>
+<option value="NVQ Plastering">NVQ Plastering</option>
 <option value="NVQ Supervision & Management">NVQ Supervision & Management</option>
+<option value="OWS NVQ">OWS NVQ</option>
 <option value="PLANT Training">PLANT Training</option>
+<option value="Plant NVQ's">Plant NVQ's</option>
 <option value="RAMS">RAMS</option>
+<option value="Roofing NVQ's">Roofing NVQ's</option>
 <option value="SHEA">SHEA</option>
 <option value="Safety Harness">Safety Harness</option>
 <option value="Slinging & Lifting">Slinging & Lifting</option>
@@ -153,6 +164,8 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 <option value="West Midlands">West Midlands</option>
 <option value="Yorkshire & Humber">Yorkshire & Humber</option>
 <option value="Nationwide / Remote">Nationwide / Remote</option></select></div>
+        <div class="sf"><label>Virtual</label><select id="tv" onchange="renderT()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
+        <div class="sf"><label>Role</label><select id="tro" onchange="renderT()"><option value="">All</option><option value="trainer">Trainer</option><option value="assessor">Assessor</option></select></div>
         <div class="sf" style="flex:0"><label>&nbsp;</label><button class="clr" onclick="clearT()">Clear</button></div>
       </div>
       <div class="rmeta"><span class="rc" id="tc2"></span><span class="rf" id="tf"></span></div>
@@ -204,6 +217,20 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 <option value="Vehicle Banksman">Vehicle Banksman</option>
 <option value="Water Jetting">Water Jetting</option>
 <option value="Working at height">Working at height</option></select></div>
+        <div class="sf"><label>Region</label><select id="pr" onchange="renderP()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
+<option value="East of England">East of England</option>
+<option value="London">London</option>
+<option value="North East England">North East England</option>
+<option value="North West England">North West England</option>
+<option value="Northern Ireland">Northern Ireland</option>
+<option value="Scotland">Scotland</option>
+<option value="South East England">South East England</option>
+<option value="South West England">South West England</option>
+<option value="Wales">Wales</option>
+<option value="West Midlands">West Midlands</option>
+<option value="Yorkshire & Humber">Yorkshire & Humber</option>
+<option value="Nationwide / Remote">Nationwide / Remote</option></select></div>
+        <div class="sf"><label>Virtual</label><select id="pv" onchange="renderP()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
         <div class="sf" style="flex:0"><label>&nbsp;</label><button class="clr" onclick="clearP()">Clear</button></div>
       </div>
       <div class="rmeta"><span class="rc" id="pc2"></span><span class="rf" id="pf"></span></div>
@@ -213,264 +240,213 @@ select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,
 </div>
 
 <script>
-// ── Config ────────────────────────────────────────────────────────────────────
-const CLIENT_ID = "8c726285-27a0-417a-97f4-18e7bc2fae1a";
-const TENANT    = "acadame.sharepoint.com";
-const SITE      = "Sales94";
-const LIBRARY   = "Shared Documents";
-const FOLDER    = "Sales Tool Data";
-const FILE      = "acadame-database.xlsx";
-const SCOPES    = ["Files.Read","Sites.Read.All","User.Read"];
+const CLIENT_ID="8c726285-27a0-417a-97f4-18e7bc2fae1a", TENANT_ID="a88bd07b-c574-4fea-b28b-31e5482fca8e";
+const TENANT="acadame.sharepoint.com", SITE="Sales94", LIBRARY="Shared Documents", FOLDER="Sales Tool Data", FILE="acadame-database.xlsx";
+const REDIRECT="https://acadame-training.github.io/sales-tools/acadame-finder.html";
+const SCOPES=["Files.Read","Sites.Read.All","User.Read"];
+const AUTH_BASE=`https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0`;
 
-// ── Auth state ────────────────────────────────────────────────────────────────
-let accessToken = null;
-let trainers = [], partners = [], loadedAt = null;
+let accessToken=null, trainers=[], partners=[], loadedAt=null;
+const el=id=>document.getElementById(id);
 
-const el = id => document.getElementById(id);
-
-function show(id) {
-  ["auth-s","loading-s","error-s","main"].forEach(s => {
-    el(s).style.display = s === id ? (id==="auth-s"?"flex":"block") : "none";
+function show(id){
+  ["auth-s","loading-s","error-s","main"].forEach(s=>{
+    el(s).style.display=s===id?(id==="auth-s"?"flex":"block"):"none";
   });
-  el("tabs").style.display = id==="main" ? "flex" : "none";
+  el("tabs").style.display=id==="main"?"flex":"none";
 }
 
-// ── PKCE Auth Code Flow (no library needed) ───────────────────────────────────
-function b64url(buf) {
-  return btoa(String.fromCharCode(...new Uint8Array(buf)))
-    .replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,"");
+function b64url(buf){return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,"")}
+
+async function generatePKCE(){
+  const verifier=b64url(crypto.getRandomValues(new Uint8Array(32)));
+  const hash=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(verifier));
+  return{verifier,challenge:b64url(hash)};
 }
 
-async function generatePKCE() {
-  const verifier = b64url(crypto.getRandomValues(new Uint8Array(32)));
-  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
-  const challenge = b64url(hash);
-  return { verifier, challenge };
+async function doSignIn(){
+  const{verifier,challenge}=await generatePKCE();
+  const state=b64url(crypto.getRandomValues(new Uint8Array(16)));
+  sessionStorage.setItem("pkce_verifier",verifier);
+  sessionStorage.setItem("pkce_state",state);
+  const p=new URLSearchParams({client_id:CLIENT_ID,response_type:"code",
+    redirect_uri:REDIRECT,scope:SCOPES.join(" ")+" offline_access",
+    code_challenge:challenge,code_challenge_method:"S256",state,response_mode:"query"});
+  window.location.href=`${AUTH_BASE}/authorize?${p}`;
 }
 
-async function doSignIn() {
-  try {
-    const { verifier, challenge } = await generatePKCE();
-    const state = b64url(crypto.getRandomValues(new Uint8Array(16)));
-    sessionStorage.setItem("pkce_verifier", verifier);
-    sessionStorage.setItem("pkce_state", state);
-    sessionStorage.setItem("redirect_back", "https://acadame-training.github.io/sales-tools/acadame-finder.html");
-
-    const params = new URLSearchParams({
-      client_id:             CLIENT_ID,
-      response_type:         "code",
-      redirect_uri:          "https://acadame-training.github.io/sales-tools/acadame-finder.html",
-      scope:                 SCOPES.join(" ") + " offline_access",
-      code_challenge:        challenge,
-      code_challenge_method: "S256",
-      state:                 state,
-      response_mode:         "query",
-    });
-
-    window.location.href = `https://login.microsoftonline.com/a88bd07b-c574-4fea-b28b-31e5482fca8e/oauth2/v2.0/authorize?${params}`;
-  } catch(e) {
-    showErr("Sign-in failed: " + e.message);
-  }
-}
-
-async function handleCallback() {
-  const params = new URLSearchParams(window.location.search);
-  const code  = params.get("code");
-  const state = params.get("state");
-  const error = params.get("error");
-
-  console.log("handleCallback: code=", code ? code.substring(0,20)+"..." : "null");
-  console.log("handleCallback: state=", state);
-  console.log("handleCallback: error=", error);
-
-  if (error) {
-    const desc = params.get("error_description") || error;
-    console.error("Auth error:", desc);
-    showErr("Sign-in error: " + desc);
-    return false;
-  }
-  if (!code) {
-    console.log("No code found in URL, returning false");
-    return false;
-  }
-
-  const savedState    = sessionStorage.getItem("pkce_state");
-  const verifier      = sessionStorage.getItem("pkce_verifier");
-  const redirectUri   = "https://acadame-training.github.io/sales-tools/acadame-finder.html";
-
-  console.log("savedState=", savedState, "state match=", state === savedState);
-  console.log("verifier exists=", !!verifier);
-
-  if (state !== savedState) {
-    console.error("State mismatch! saved:", savedState, "received:", state);
-    showErr("State mismatch — session may have expired. Please try signing in again.");
-    return false;
-  }
-
-  show("loading-s"); el("load-msg").textContent = "Completing sign-in…";
-
-  try {
-    const body = new URLSearchParams({
-      client_id:     CLIENT_ID,
-      grant_type:    "authorization_code",
-      code:          code,
-      redirect_uri:  "https://acadame-training.github.io/sales-tools/acadame-finder.html",
-      code_verifier: verifier,
-    });
-
-    const res  = await fetch("https://login.microsoftonline.com/a88bd07b-c574-4fea-b28b-31e5482fca8e/oauth2/v2.0/token", {
-      method:  "POST",
-      headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      body:    body.toString(),
-    });
-    const data = await res.json();
-    console.log("Token response keys:", Object.keys(data));
-    if (data.error) {
-      console.error("Token error:", data.error, data.error_description);
-      throw new Error(data.error_description || data.error);
-    }
-
-    accessToken = data.access_token;
-    if (data.refresh_token) sessionStorage.setItem("refresh_token", data.refresh_token);
-
-    // Decode name from id_token
-    try {
-      const payload = JSON.parse(atob(data.id_token.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));
-      el("upill").textContent = payload.name || payload.preferred_username || "";
-      el("upill").style.display = "inline-block";
-    } catch(e) {}
-
-    // Clean URL
-    window.history.replaceState({}, "", redirectUri);
-    sessionStorage.removeItem("pkce_verifier");
-    sessionStorage.removeItem("pkce_state");
+async function handleCallback(){
+  const params=new URLSearchParams(window.location.search);
+  const code=params.get("code"),state=params.get("state"),error=params.get("error");
+  if(error){showErr("Sign-in error: "+(params.get("error_description")||error));return false;}
+  if(!code)return false;
+  const savedState=sessionStorage.getItem("pkce_state");
+  const verifier=sessionStorage.getItem("pkce_verifier");
+  if(state!==savedState){showErr("Session expired — please try signing in again.");return false;}
+  show("loading-s"); el("load-msg").textContent="Completing sign-in…";
+  try{
+    const body=new URLSearchParams({client_id:CLIENT_ID,grant_type:"authorization_code",
+      code,redirect_uri:REDIRECT,code_verifier:verifier});
+    const res=await fetch(`${AUTH_BASE}/token`,{method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},body:body.toString()});
+    const data=await res.json();
+    if(data.error)throw new Error(data.error_description||data.error);
+    accessToken=data.access_token;
+    if(data.refresh_token)sessionStorage.setItem("refresh_token",data.refresh_token);
+    try{
+      const payload=JSON.parse(atob(data.id_token.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));
+      el("upill").textContent=payload.name||payload.preferred_username||"";
+      el("upill").style.display="inline-block";
+    }catch(e){}
+    window.history.replaceState({}, "", REDIRECT);
+    sessionStorage.removeItem("pkce_verifier"); sessionStorage.removeItem("pkce_state");
     return true;
-  } catch(e) {
-    showErr("Token exchange failed: " + e.message);
-    return false;
-  }
+  }catch(e){showErr("Sign-in failed: "+e.message);return false;}
 }
 
-async function refreshToken() {
-  const rt = sessionStorage.getItem("refresh_token");
-  if (!rt) return false;
-  try {
-    const body = new URLSearchParams({
-      client_id:     CLIENT_ID,
-      grant_type:    "refresh_token",
-      refresh_token: rt,
-      scope:         SCOPES.join(" ") + " offline_access",
-    });
-    const res  = await fetch("https://login.microsoftonline.com/a88bd07b-c574-4fea-b28b-31e5482fca8e/oauth2/v2.0/token", {
-      method:  "POST",
-      headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      body:    body.toString(),
-    });
-    const data = await res.json();
-    if (data.error) return false;
-    accessToken = data.access_token;
-    if (data.refresh_token) sessionStorage.setItem("refresh_token", data.refresh_token);
+async function refreshToken(){
+  const rt=sessionStorage.getItem("refresh_token"); if(!rt)return false;
+  try{
+    const body=new URLSearchParams({client_id:CLIENT_ID,grant_type:"refresh_token",
+      refresh_token:rt,scope:SCOPES.join(" ")+" offline_access"});
+    const res=await fetch(`${AUTH_BASE}/token`,{method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},body:body.toString()});
+    const data=await res.json();
+    if(data.error)return false;
+    accessToken=data.access_token;
+    if(data.refresh_token)sessionStorage.setItem("refresh_token",data.refresh_token);
     return true;
-  } catch(e) { return false; }
+  }catch(e){return false;}
 }
 
-// ── Graph ─────────────────────────────────────────────────────────────────────
-async function graph(url) {
-  const res = await fetch("https://graph.microsoft.com/v1.0" + url, {
-    headers: { Authorization: "Bearer " + accessToken }
-  });
-  if (res.status === 401) {
-    const ok = await refreshToken();
-    if (ok) return graph(url);
-    show("auth-s"); throw new Error("Session expired — please sign in again.");
-  }
-  if (!res.ok) throw new Error(`Graph ${res.status}: ${await res.text()}`);
+async function graph(url){
+  const res=await fetch("https://graph.microsoft.com/v1.0"+url,{headers:{Authorization:"Bearer "+accessToken}});
+  if(res.status===401){const ok=await refreshToken();if(ok)return graph(url);show("auth-s");throw new Error("Session expired");}
+  if(!res.ok)throw new Error(`Graph ${res.status}: ${await res.text()}`);
   return res.json();
 }
 
-async function loadData() {
+async function loadData(){
   show("loading-s");
-  try {
-    el("load-msg").textContent = "Finding SharePoint site…";
-    const site  = await graph(`/sites/${TENANT}:/sites/${SITE}`);
-    el("load-msg").textContent = "Locating document library…";
-    const drives = await graph(`/sites/${site.id}/drives`);
-    const drive  = drives.value.find(d => d.name === LIBRARY || d.name === "Documents");
-    if (!drive) throw new Error(`Library "${LIBRARY}" not found. Available: ${drives.value.map(d=>d.name).join(", ")}`);
-    el("load-msg").textContent = "Loading Excel file…";
-    const file   = await graph(`/drives/${drive.id}/root:/${FOLDER}/${FILE}`);
-    el("load-msg").textContent = "Reading trainer data…";
-    const tRows  = await graph(`/drives/${drive.id}/items/${file.id}/workbook/worksheets/Trainer Search/usedRange`);
-    el("load-msg").textContent = "Reading broker data…";
-    const pRows  = await graph(`/drives/${drive.id}/items/${file.id}/workbook/worksheets/Broker & Partner Search/usedRange`);
-    trainers  = parseSheet(tRows, "trainer");
-    partners  = parseSheet(pRows, "partner");
-    loadedAt  = new Date();
-    el("hdr-s").textContent = "Updated " + loadedAt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
-    show("main");
-    renderT(); renderP();
-  } catch(e) { showErr(e.message); }
+  try{
+    el("load-msg").textContent="Connecting to SharePoint…";
+    const site=await graph(`/sites/${TENANT}:/sites/${SITE}`);
+    el("load-msg").textContent="Locating document library…";
+    const drives=await graph(`/sites/${site.id}/drives`);
+    const drive=drives.value.find(d=>d.name===LIBRARY||d.name==="Documents");
+    if(!drive)throw new Error(`Library "${LIBRARY}" not found. Found: ${drives.value.map(d=>d.name).join(", ")}`);
+    el("load-msg").textContent="Loading Excel file…";
+    const file=await graph(`/drives/${drive.id}/root:/${FOLDER}/${FILE}`);
+    el("load-msg").textContent="Reading trainer data…";
+    const tRows=await graph(`/drives/${drive.id}/items/${file.id}/workbook/worksheets/Trainer Search/usedRange`);
+    el("load-msg").textContent="Reading broker data…";
+    const pRows=await graph(`/drives/${drive.id}/items/${file.id}/workbook/worksheets/Broker & Partner Search/usedRange`);
+    trainers=parseSheet(tRows,"trainer");
+    partners=parseSheet(pRows,"partner");
+    loadedAt=new Date();
+    el("hdr-s").textContent="Updated "+loadedAt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+    show("main"); renderT(); renderP();
+  }catch(e){showErr(e.message);}
 }
 
-function parseSheet(r, type) {
-  const rows = r.values; if (!rows||rows.length<9) return [];
-  const hdrs = rows[7].map(h=>String(h||"").trim().toLowerCase());
-  const out  = [];
-  for (let i=8;i<rows.length;i++) {
-    const row=rows[i]; if (!row[0]||!String(row[0]).trim()) continue;
-    const o={}; hdrs.forEach((h,ci)=>{ o[h]=String(row[ci]??"").trim()||""; });
-    if (type==="trainer") out.push({name:o.name,phone:o.phone,email:o.email,
-      courses:o["courses delivered"]?o["courses delivered"].split(",").map(s=>s.trim()).filter(Boolean):[],
+function parseSheet(r,type){
+  const rows=r.values; if(!rows||rows.length<9)return[];
+  const hdrs=rows[7].map(h=>String(h||"").trim().toLowerCase());
+  const out=[];
+  for(let i=8;i<rows.length;i++){
+    const row=rows[i]; if(!row[0]||!String(row[0]).trim())continue;
+    const o={}; hdrs.forEach((h,ci)=>{o[h]=String(row[ci]??"").trim()||""});
+    if(type==="trainer")out.push({name:o.name,role:o.role||"trainer",phone:o.phone,email:o.email,
+      courses:(o["courses / qualifications"]||o["courses delivered"]||"").split(",").map(s=>s.trim()).filter(Boolean),
       area:o["region / area"]||"",dailyRate:o["day rate"]||"",halfDayRate:o["half day"]||"",
       mileage:o.mileage||"",paymentTerms:o["payment terms"]||"",virtualDelivery:o["virtual?"]||""});
     else out.push({name:o["company name"]||o.name,phone:o.phone,email:o.email,discount:o.discount,
-      courses:o["courses offered"]?o["courses offered"].split(",").map(s=>s.trim()).filter(Boolean):[],
-      paymentTerms:o["payment terms"]||""});
+      courses:(o["courses offered"]||"").split(",").map(s=>s.trim()).filter(Boolean),
+      area:o["region / area"]||"",virtualDelivery:o["virtual?"]||"",paymentTerms:o["payment terms"]||""});
   }
   return out;
 }
 
-function showErr(msg) { el("err-msg").innerHTML="<strong>Something went wrong</strong><br>"+msg; show("error-s"); }
+function showErr(msg){el("err-msg").innerHTML="<strong>Something went wrong</strong><br>"+msg;show("error-s");}
 
-// ── Render ────────────────────────────────────────────────────────────────────
 function initials(n){return(n||"?").split(" ").slice(0,2).map(w=>w[0]||"").join("").toUpperCase()}
 function hl(t,q){if(!q||!t)return t||"";const re=new RegExp("("+q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","gi");return String(t).replace(re,"<mark style='background:#FEF08A;border-radius:2px;padding:0 1px'>$1</mark>")}
 
+// Phone: use Webex protocol, fallback to tel:
+function phoneBtn(phone, q){
+  if(!phone)return'<span class="cb2 bn">No phone</span>';
+  const display=hl(phone,q);
+  // Webex uses callto: or webextel: protocol; fallback tel: works too
+  return`<a class="cb2 bp" href="callto:${phone}" title="Call via Webex"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 0 1 1-1h2.5a1 1 0 0 1 .96.72l.8 2.8a1 1 0 0 1-.29 1.02L5.7 7.56C6.9 9.9 8.1 11.1 10.42 12.29l1.02-1.31a1 1 0 0 1 1.02-.29l2.8.8A1 1 0 0 1 16 12.5V15a1 1 0 0 1-1 1C6.16 16 0 9.84 0 2a1 1 0 0 1 1-1h1Z" fill="currentColor"/></svg>${display}</a>`;
+}
+
+// Email: use mailto: which Outlook intercepts as default mail client
+function emailBtn(email){
+  if(!email)return'<span class="cb2 bn">No email</span>';
+  return`<a class="cb2 be" href="mailto:${email}" title="Open in Outlook"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M1 3h14v10H1V3Zm0 0l7 6 7-6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Email</a>`;
+}
+
 function renderT(){
-  const q=el("tq").value.trim().toLowerCase(),cf=el("tc").value,rf=el("tr").value;
+  const q=el("tq").value.trim().toLowerCase(),cf=el("tc").value,
+        rf=el("tr").value,vf=el("tv").value.toLowerCase(),rof=el("tro").value.toLowerCase();
   const res=trainers.filter(t=>{
-    const mq=!q||[t.name,...t.courses,t.area,t.phone,t.email,t.dailyRate,t.paymentTerms].join(" ").toLowerCase().includes(q);
+    const mq=!q||[t.name,t.role,...t.courses,t.area,t.phone,t.email,t.dailyRate,t.paymentTerms].join(" ").toLowerCase().includes(q);
     const mc=!cf||t.courses.includes(cf);
     const mr=!rf||(t.area||"").toLowerCase().includes(rf.toLowerCase());
-    return mq&&mc&&mr;
+    const mv=!vf||(t.virtualDelivery||"").toLowerCase().includes(vf);
+    const mro=!rof||(t.role||"trainer").toLowerCase()===rof;
+    return mq&&mc&&mr&&mv&&mro;
   });
-  el("tc2").textContent=res.length+" trainer"+(res.length!==1?"s":"")+" found";
-  el("tf").textContent=loadedAt?"Data loaded "+loadedAt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):"";
-  if(!res.length){el("tg").innerHTML='<div class="empty"><h3>No trainers found</h3><p>Try a different keyword or remove a filter</p></div>';return;}
+  el("tc2").textContent=res.length+" record"+(res.length!==1?"s":"")+" found";
+  el("tf").textContent=loadedAt?"Loaded "+loadedAt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):"";
+  if(!res.length){el("tg").innerHTML='<div class="empty"><h3>No records found</h3><p>Try a different keyword or remove a filter</p></div>';return;}
   el("tg").innerHTML=res.map(t=>{
+    const role=(t.role||"trainer").toLowerCase();
+    const isAssessor=role==="assessor";
     const tags=t.courses.map(c=>`<span class="ct ${cf===c?"hl":""}">${hl(c,q)}</span>`).join("");
     const rate=[t.dailyRate&&`Day: ${t.dailyRate}`,t.halfDayRate&&`Half: ${t.halfDayRate}`].filter(Boolean).join(" · ")||null;
-    const pb=t.phone?`<a class="cb2 bp" href="tel:${t.phone}">${t.phone}</a>`:`<span class="cb2 bn">No phone</span>`;
-    const eb=t.email?`<a class="cb2 be" href="mailto:${t.email}">Email</a>`:`<span class="cb2 bn">No email</span>`;
-    return `<div class="card"><div class="ch"><div class="av">${initials(t.name)}</div><div><div class="cn">${hl(t.name,q)}</div>${t.area?`<div class="cs">${hl(t.area,q)}</div>`:""}</div></div><div class="cb"><div class="ctags">${tags||'<span style="font-size:12px;color:var(--tl)">No courses listed</span>'}</div><div class="dg"><div class="dl"><span class="dlb">Rate</span><span class="dlv ${rate?"":"e"}">${rate||"Not listed"}</span></div><div class="dl"><span class="dlb">Mileage</span><span class="dlv ${t.mileage?"":"e"}">${t.mileage||"Not listed"}</span></div><div class="dl"><span class="dlb">Payment</span><span class="dlv ${t.paymentTerms?"":"e"}">${t.paymentTerms||"Not listed"}</span></div></div></div><div class="cf">${pb}${eb}</div></div>`;
+    const virt=t.virtualDelivery?`<div class="cs" style="color:#16A34A;font-size:11px">&#10003; Virtual delivery</div>`:"";
+    return`<div class="card"><div class="ch">
+      <div class="av ${isAssessor?"assessor":""}">${initials(t.name)}</div>
+      <div><div class="cn">${hl(t.name,q)}</div>
+      <span class="role-badge ${isAssessor?"role-assessor":"role-trainer"}">${isAssessor?"Assessor":"Trainer"}</span>
+      ${t.area?`<div class="cs">${hl(t.area,q)}</div>`:""}</div></div>
+      <div class="cb"><div class="ctags">${tags||'<span style="font-size:12px;color:var(--tl)">No courses listed</span>'}</div>
+      <div class="dg">
+        <div class="dl"><span class="dlb">Rate</span><span class="dlv ${rate?"":"e"}">${rate||"Not listed"}</span></div>
+        <div class="dl"><span class="dlb">Mileage</span><span class="dlv ${t.mileage?"":"e"}">${t.mileage||"Not listed"}</span></div>
+        <div class="dl"><span class="dlb">Payment</span><span class="dlv ${t.paymentTerms?"":"e"}">${t.paymentTerms||"Not listed"}</span></div>
+        <div class="dl"><span class="dlb">Virtual</span><span class="dlv ${t.virtualDelivery?"":"e"}">${t.virtualDelivery||"Not listed"}</span></div>
+      </div></div>
+      <div class="cf">${phoneBtn(t.phone,q)}${emailBtn(t.email)}</div></div>`;
   }).join("");
 }
 
 function renderP(){
-  const q=el("pq").value.trim().toLowerCase(),cf=el("pc").value;
+  const q=el("pq").value.trim().toLowerCase(),cf=el("pc").value,
+        rf=el("pr").value,vf=el("pv").value.toLowerCase();
   const res=partners.filter(p=>{
-    const mq=!q||[p.name,...p.courses,p.phone,p.email,p.discount].join(" ").toLowerCase().includes(q);
+    const mq=!q||[p.name,...p.courses,p.phone,p.email,p.discount,p.area].join(" ").toLowerCase().includes(q);
     const mc=!cf||p.courses.includes(cf);
-    return mq&&mc;
+    const mr=!rf||(p.area||"").toLowerCase().includes(rf.toLowerCase());
+    const mv=!vf||(p.virtualDelivery||"").toLowerCase().includes(vf);
+    return mq&&mc&&mr&&mv;
   });
   el("pc2").textContent=res.length+" partner"+(res.length!==1?"s":"")+" found";
-  el("pf").textContent=loadedAt?"Data loaded "+loadedAt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):"";
+  el("pf").textContent=loadedAt?"Loaded "+loadedAt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):"";
   if(!res.length){el("pg").innerHTML='<div class="empty"><h3>No partners found</h3><p>Try a different keyword or remove a filter</p></div>';return;}
   el("pg").innerHTML=res.map(p=>{
     const tags=p.courses.map(c=>`<span class="ct ${cf===c?"hl":""}">${hl(c,q)}</span>`).join("");
-    const pb=p.phone?`<a class="cb2 bp" href="tel:${p.phone}">${p.phone}</a>`:`<span class="cb2 bn">No phone</span>`;
-    const eb=p.email?`<a class="cb2 be" href="mailto:${p.email}">Email</a>`:`<span class="cb2 bn">No email</span>`;
-    return `<div class="card"><div class="ch"><div class="av">${initials(p.name)}</div><div style="flex:1;min-width:0"><div class="cn">${hl(p.name,q)}</div>${p.discount?`<div class="cs" style="margin-top:4px"><span class="dp">&#9660; ${p.discount} discount</span></div>`:""}</div></div><div class="cb"><div class="ctags">${tags||'<span style="font-size:12px;color:var(--tl)">No courses listed</span>'}</div><div class="dg"><div class="dl"><span class="dlb">Payment</span><span class="dlv ${p.paymentTerms?"":"e"}">${p.paymentTerms||"Not listed"}</span></div></div></div><div class="cf">${pb}${eb}</div></div>`;
+    return`<div class="card"><div class="ch"><div class="av">${initials(p.name)}</div>
+      <div style="flex:1;min-width:0"><div class="cn">${hl(p.name,q)}</div>
+      ${p.discount?`<div class="cs" style="margin-top:4px"><span class="dp">&#9660; ${p.discount} discount</span></div>`:""}
+      ${p.area?`<div class="cs">${hl(p.area,q)}</div>`:""}</div></div>
+      <div class="cb"><div class="ctags">${tags||'<span style="font-size:12px;color:var(--tl)">No courses listed</span>'}</div>
+      <div class="dg">
+        <div class="dl"><span class="dlb">Virtual</span><span class="dlv ${p.virtualDelivery?"":"e"}">${p.virtualDelivery||"Not listed"}</span></div>
+        <div class="dl"><span class="dlb">Payment</span><span class="dlv ${p.paymentTerms?"":"e"}">${p.paymentTerms||"Not listed"}</span></div>
+      </div></div>
+      <div class="cf">${phoneBtn(p.phone,q)}${emailBtn(p.email)}</div></div>`;
   }).join("");
 }
 
@@ -480,28 +456,16 @@ function showTab(t){
   el("tab-t").classList.toggle("active",t==="t");
   el("tab-p").classList.toggle("active",t==="p");
 }
-function clearT(){el("tq").value="";el("tc").value="";el("tr").value="";renderT();}
-function clearP(){el("pq").value="";el("pc").value="";renderP();}
+function clearT(){el("tq").value="";el("tc").value="";el("tr").value="";el("tv").value="";el("tro").value="";renderT();}
+function clearP(){el("pq").value="";el("pc").value="";el("pr").value="";el("pv").value="";renderP();}
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-async function init() {
-  const qs = window.location.search;
-  console.log("init() — search params:", qs);
-  // Check if returning from auth redirect
-  if (qs.includes("code=") || qs.includes("error=")) {
-    console.log("Detected auth callback, running handleCallback()");
-    const ok = await handleCallback();
-    console.log("handleCallback returned:", ok);
-    if (ok) { await loadData(); return; }
-    return;
+async function init(){
+  if(window.location.search.includes("code=")||window.location.search.includes("error=")){
+    const ok=await handleCallback(); if(ok){await loadData();return;} return;
   }
-  // Check for existing refresh token
-  if (sessionStorage.getItem("refresh_token")) {
-    console.log("Found refresh token, attempting silent refresh");
-    const ok = await refreshToken();
-    if (ok) { await loadData(); return; }
+  if(sessionStorage.getItem("refresh_token")){
+    const ok=await refreshToken(); if(ok){await loadData();return;}
   }
-  console.log("No auth found, showing sign-in screen");
   show("auth-s");
 }
 
