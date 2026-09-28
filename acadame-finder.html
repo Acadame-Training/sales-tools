@@ -254,12 +254,12 @@ async function doSignIn() {
     const state = b64url(crypto.getRandomValues(new Uint8Array(16)));
     sessionStorage.setItem("pkce_verifier", verifier);
     sessionStorage.setItem("pkce_state", state);
-    sessionStorage.setItem("redirect_back", window.location.href.split("?")[0].split("#")[0]);
+    sessionStorage.setItem("redirect_back", "https://acadame-training.github.io/sales-tools/acadame-finder.html");
 
     const params = new URLSearchParams({
       client_id:             CLIENT_ID,
       response_type:         "code",
-      redirect_uri:          window.location.href.split("?")[0].split("#")[0],
+      redirect_uri:          "https://acadame-training.github.io/sales-tools/acadame-finder.html",
       scope:                 SCOPES.join(" ") + " offline_access",
       code_challenge:        challenge,
       code_challenge_method: "S256",
@@ -287,7 +287,7 @@ async function handleCallback() {
 
   const savedState    = sessionStorage.getItem("pkce_state");
   const verifier      = sessionStorage.getItem("pkce_verifier");
-  const redirectUri   = sessionStorage.getItem("redirect_back") || window.location.href.split("?")[0].split("#")[0];
+  const redirectUri   = "https://acadame-training.github.io/sales-tools/acadame-finder.html";
 
   if (state !== savedState) { showErr("State mismatch — please try signing in again."); return false; }
 
@@ -298,7 +298,7 @@ async function handleCallback() {
       client_id:     CLIENT_ID,
       grant_type:    "authorization_code",
       code:          code,
-      redirect_uri:  redirectUri,
+      redirect_uri:  "https://acadame-training.github.io/sales-tools/acadame-finder.html",
       code_verifier: verifier,
     });
 
