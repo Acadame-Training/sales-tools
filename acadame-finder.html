@@ -1536,7 +1536,7 @@ function renderT(){
     if(tacv==="noloc"&&t.postcode)return false;
     t._dist=null;t._tag="";
     if(enq){const m=enquiryMatch(t);if(!m)return false;t._dist=m.dist;t._tag=m.tag;}
-    const mq=!q||[t.name,t.role,...t.courses,t.area,t.phone,t.email,t.notes].join(" ").toLowerCase().includes(q);
+    const mq=!q||[t.name,t.role,...t.courses,t.area,t.postcode,t.phone,t.email,t.notes].join(" ").toLowerCase().includes(q);
     let mc=true;if(selC.length)mc=tMatchMode==="any"?selC.some(c=>t.courses.includes(c)):selC.every(c=>t.courses.includes(c));
     return mq&&mc&&(!rf||(t.area||"").toLowerCase().includes(rf.toLowerCase()))&&(!vf||(t.virtualDelivery||"").toLowerCase().includes(vf))&&(!rof||t.role===rof)&&t.rating>=minSt;
   });
