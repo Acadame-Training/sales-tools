@@ -30,7 +30,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .lay{max-width:1180px;margin:0 auto;padding:1.5rem}
 
 /* Search bar */
-.sbar{background:var(--cd);border:1px solid var(--br);border-radius:var(--ra);box-shadow:var(--shm);padding:1.25rem 1.5rem;margin-bottom:1rem;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.sbar{background:var(--cd);border:1px solid var(--br);border-radius:var(--ra);box-shadow:var(--shm);padding:1.25rem 1.5rem;margin-bottom:1rem;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px 14px;align-items:end}
+.sbar .sf{min-width:0;flex:none}
+.sp1{grid-column:span 1}.sp2{grid-column:span 2}.sp3{grid-column:span 3}.sp4{grid-column:span 4}
+.sbar .inp,.sbar .fsel,.sbar .clr,.sbar .cc-btn{height:40px;box-sizing:border-box}
+.sbar .inp{padding-top:0;padding-bottom:0}
+.sbar .fsel{appearance:none;-webkit-appearance:none;padding-right:30px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10' fill='none'%3E%3Cpath d='M2 3.5l3 3 3-3' stroke='%2364748B' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center}
+.sbar .clr{width:100%;padding:0 10px}
+.sbar .sf>div>.clr{width:auto;padding:0 18px;flex:none}.sbar .sf>div>.inp{flex:1;min-width:0}
+.sbar .view-toggle .vt-btn{flex:1;justify-content:center}
+.sbar .view-toggle{height:40px}.sbar .vt-btn{padding:0 14px;font-size:13px}
+.sbar .cc-wrap{width:100%}.sbar .cc-btn{width:100%}
+@media(max-width:1000px){.sbar{grid-template-columns:repeat(6,minmax(0,1fr))}.sp1,.sp2,.sp3,.sp4{grid-column:span 3}}
+@media(max-width:600px){.sbar{grid-template-columns:1fr}.sp1,.sp2,.sp3,.sp4{grid-column:span 1}}
 .sf{display:flex;flex-direction:column;gap:6px;flex:1;min-width:150px}
 .sf label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tm)}
 .sw{position:relative}.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--tl);pointer-events:none}
@@ -327,12 +339,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <div id="view-trainers">
 <div class="lay">
   <div class="sbar">
-    <div class="sf" style="flex:2">
+    <div class="sf sp4">
       <label>Keyword</label>
       <div class="sw"><svg class="si" width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       <input class="inp" type="text" id="tq" placeholder="name, course, keyword…" oninput="renderT()"></div>
     </div>
-    <div class="sf">
+    <div class="sf sp2">
       <label>Courses</label>
       <div class="cc-wrap" id="t-cc-wrap">
         <button class="cc-btn" onclick="toggleCC('t-cc')" type="button">
@@ -400,8 +412,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
         </div>
       </div>
     </div>
-    <div class="sf"><label>County</label><input class="inp" style="padding-left:12px;min-width:130px" id="tcty" list="county-list" placeholder="Any county" oninput="renderT()"></div>
-    <div class="sf"><label>Region</label><select class="fsel" id="tr" onchange="renderT()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
+    <div class="sf sp2"><label>County</label><input class="inp" style="padding-left:12px;min-width:130px" id="tcty" list="county-list" placeholder="Any county" oninput="renderT()"></div>
+    <div class="sf sp2"><label>Region</label><select class="fsel" id="tr" onchange="renderT()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
 <option value="East of England">East of England</option>
 <option value="London">London</option>
 <option value="North East England">North East England</option>
@@ -414,12 +426,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <option value="West Midlands">West Midlands</option>
 <option value="Yorkshire & Humber">Yorkshire & Humber</option>
 <option value="Nationwide / Remote">Nationwide / Remote</option></select></div>
-    <div class="sf"><label>Virtual</label><select class="fsel" id="tv" onchange="renderT()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
-    <div class="sf" style="min-width:210px"><label>Enquiry postcode</label><div style="display:flex;gap:6px"><input class="inp" style="padding-left:12px;text-transform:uppercase" id="tpc" placeholder="e.g. LS1 4AP" onkeydown="if(event.key===\'Enter\')setEnquiry()"><button class="clr" onclick="setEnquiry()">Find</button></div></div>
-    <div class="sf" style="flex:0;min-width:auto"><label>Role</label><input type="hidden" id="tro" value=""><div class="view-toggle" id="role-toggle"><button type="button" class="vt-btn active" data-v="" onclick="setRole('')">All</button><button type="button" class="vt-btn" data-v="trainer" onclick="setRole('trainer')">Trainer</button><button type="button" class="vt-btn" data-v="assessor" onclick="setRole('assessor')">Assessor</button></div></div>
-    <div class="sf"><label>Min ★</label><select class="fsel" id="tst" onchange="renderT()"><option value="0">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5</option></select></div>
-    <div class="sf"><label>Show</label><select class="fsel" id="tac" onchange="renderT()"><option value="all">Show all</option><option value="active">Active only</option><option value="noloc">Needs postcode</option><option value="nocounty">Needs county</option></select></div>
-    <div class="sf" style="flex:0"><label>&nbsp;</label><button class="clr" onclick="clearT()">Clear</button></div>
+    <div class="sf sp2"><label>Virtual</label><select class="fsel" id="tv" onchange="renderT()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
+    <div class="sf sp4"><label>Enquiry postcode</label><div style="display:flex;gap:6px"><input class="inp" style="padding-left:12px;text-transform:uppercase" id="tpc" placeholder="e.g. LS1 4AP" onkeydown="if(event.key===\'Enter\')setEnquiry()"><button class="clr" onclick="setEnquiry()">Find</button></div></div>
+    <div class="sf sp3"><label>Role</label><input type="hidden" id="tro" value=""><div class="view-toggle" id="role-toggle"><button type="button" class="vt-btn active" data-v="" onclick="setRole('')">All</button><button type="button" class="vt-btn" data-v="trainer" onclick="setRole('trainer')">Trainer</button><button type="button" class="vt-btn" data-v="assessor" onclick="setRole('assessor')">Assessor</button></div></div>
+    <div class="sf sp2"><label>Min ★</label><select class="fsel" id="tst" onchange="renderT()"><option value="0">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5</option></select></div>
+    <div class="sf sp2"><label>Show</label><select class="fsel" id="tac" onchange="renderT()"><option value="all">Show all</option><option value="active">Active only</option><option value="noloc">Needs postcode</option><option value="nocounty">Needs county</option></select></div>
+    <div class="sf sp1"><label>&nbsp;</label><button class="clr" onclick="clearT()">Clear</button></div>
   </div>
   <div class="rmeta">
     <span class="rc" id="tc2"></span>
@@ -452,12 +464,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <div id="view-partners" style="display:none">
 <div class="lay">
   <div class="sbar">
-    <div class="sf" style="flex:2">
+    <div class="sf sp4">
       <label>Keyword</label>
       <div class="sw"><svg class="si" width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       <input class="inp" type="text" id="pq" placeholder="company, course, keyword…" oninput="renderP()"></div>
     </div>
-    <div class="sf">
+    <div class="sf sp2">
       <label>Courses</label>
       <div class="cc-wrap" id="p-cc-wrap">
         <button class="cc-btn" onclick="toggleCC('p-cc')" type="button">
@@ -519,8 +531,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
         </div>
       </div>
     </div>
-    <div class="sf"><label>County</label><input class="inp" style="padding-left:12px;min-width:130px" id="pcty" list="county-list" placeholder="Any county" oninput="renderP()"></div>
-    <div class="sf"><label>Region</label><select class="fsel" id="pr" onchange="renderP()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
+    <div class="sf sp2"><label>County</label><input class="inp" style="padding-left:12px;min-width:130px" id="pcty" list="county-list" placeholder="Any county" oninput="renderP()"></div>
+    <div class="sf sp2"><label>Region</label><select class="fsel" id="pr" onchange="renderP()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
 <option value="East of England">East of England</option>
 <option value="London">London</option>
 <option value="North East England">North East England</option>
@@ -533,10 +545,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <option value="West Midlands">West Midlands</option>
 <option value="Yorkshire & Humber">Yorkshire & Humber</option>
 <option value="Nationwide / Remote">Nationwide / Remote</option></select></div>
-    <div class="sf"><label>Virtual</label><select class="fsel" id="pv" onchange="renderP()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
-    <div class="sf"><label>Min ★</label><select class="fsel" id="pst" onchange="renderP()"><option value="0">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5</option></select></div>
-    <div class="sf"><label>Show</label><select class="fsel" id="pac" onchange="renderP()"><option value="all">Show all</option><option value="active">Active only</option><option value="nocounty">Needs county</option></select></div>
-    <div class="sf" style="flex:0"><label>&nbsp;</label><button class="clr" onclick="clearP()">Clear</button></div>
+    <div class="sf sp2"><label>Virtual</label><select class="fsel" id="pv" onchange="renderP()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
+    <div class="sf sp3"><label>Min ★</label><select class="fsel" id="pst" onchange="renderP()"><option value="0">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5</option></select></div>
+    <div class="sf sp3"><label>Show</label><select class="fsel" id="pac" onchange="renderP()"><option value="all">Show all</option><option value="active">Active only</option><option value="nocounty">Needs county</option></select></div>
+    <div class="sf sp2"><label>&nbsp;</label><button class="clr" onclick="clearP()">Clear</button></div>
   </div>
   <div class="rmeta">
     <span class="rc" id="pc2"></span>
