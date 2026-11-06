@@ -253,6 +253,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .enq-bar{display:none;align-items:center;gap:10px;flex-wrap:wrap;background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46;border-radius:var(--rs);padding:8px 12px;font-size:13px;margin-bottom:10px}
 .enq-bar b{font-weight:700}.enq-bar button{margin-left:auto;border:none;background:none;color:#065F46;cursor:pointer;font-size:12px;text-decoration:underline}
 .dist-tag{font-size:12px;font-weight:700;color:#16A34A;margin-top:2px}
+.sel-cb{width:18px;height:18px;flex:none;accent-color:var(--navy);cursor:pointer;margin:0 2px 0 0}
+.sel-bar{display:none;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:900;align-items:center;gap:12px;background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:14px}
+.sel-bar button{border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;font-size:13px}
+.sel-bar .go{background:#fff;color:var(--navy)}.sel-bar .cl{background:transparent;color:#fff;text-decoration:underline;padding:8px 4px}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
 .modal-overlay.open{display:flex}
 .modal{background:var(--cd);border-radius:var(--ra);box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:560px;max-height:90vh;overflow-y:auto}
@@ -396,6 +400,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
         </div>
       </div>
     </div>
+    <div class="sf"><label>County</label><input class="inp" style="padding-left:12px;min-width:130px" id="tcty" list="county-list" placeholder="Any county" oninput="renderT()"></div>
     <div class="sf"><label>Region</label><select class="fsel" id="tr" onchange="renderT()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
 <option value="East of England">East of England</option>
 <option value="London">London</option>
@@ -413,12 +418,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
     <div class="sf" style="min-width:210px"><label>Enquiry postcode</label><div style="display:flex;gap:6px"><input class="inp" style="padding-left:12px;text-transform:uppercase" id="tpc" placeholder="e.g. LS1 4AP" onkeydown="if(event.key===\'Enter\')setEnquiry()"><button class="clr" onclick="setEnquiry()">Find</button></div></div>
     <div class="sf" style="flex:0;min-width:auto"><label>Role</label><input type="hidden" id="tro" value=""><div class="view-toggle" id="role-toggle"><button type="button" class="vt-btn active" data-v="" onclick="setRole('')">All</button><button type="button" class="vt-btn" data-v="trainer" onclick="setRole('trainer')">Trainer</button><button type="button" class="vt-btn" data-v="assessor" onclick="setRole('assessor')">Assessor</button></div></div>
     <div class="sf"><label>Min ★</label><select class="fsel" id="tst" onchange="renderT()"><option value="0">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5</option></select></div>
-    <div class="sf"><label>Show</label><select class="fsel" id="tac" onchange="renderT()"><option value="all">Show all</option><option value="active">Active only</option><option value="noloc">Needs postcode</option></select></div>
+    <div class="sf"><label>Show</label><select class="fsel" id="tac" onchange="renderT()"><option value="all">Show all</option><option value="active">Active only</option><option value="noloc">Needs postcode</option><option value="nocounty">Needs county</option></select></div>
     <div class="sf" style="flex:0"><label>&nbsp;</label><button class="clr" onclick="clearT()">Clear</button></div>
   </div>
   <div class="rmeta">
     <span class="rc" id="tc2"></span>
     <div class="view-controls">
+      <button class="clr" style="padding:6px 10px;font-size:12px" onclick="selectAllShown(true)" title="Tick every active trainer with an email address in the current results">☑ Select all shown</button>
       <span class="sort-hint" id="t-sort-hint" style="display:none">↓ Sorted cheapest first</span>
       <select class="sort-sel" id="t-sort" onchange="renderT()"><option value="price">Cheapest first</option><option value="distance">Nearest first</option><option value="name">A–Z</option><option value="region">By region</option><option value="rating">Highest rated</option></select>
       <div class="view-toggle">
@@ -432,7 +438,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
       <span class="rf" id="tf"></span>
     </div>
   </div>
-  <div class="enq-bar" id="enq-bar"></div>
+  <datalist id="county-list"><option value="Aberdeenshire"><option value="Angus"><option value="Antrim"><option value="Argyll and Bute"><option value="Armagh"><option value="Bedfordshire"><option value="Berkshire"><option value="Bristol"><option value="Buckinghamshire"><option value="Cambridgeshire"><option value="Cheshire"><option value="Cleveland"><option value="Clwyd"><option value="Cornwall"><option value="County Durham"><option value="Cumbria"><option value="Derbyshire"><option value="Devon"><option value="Dorset"><option value="Down"><option value="Dumfries and Galloway"><option value="Dyfed"><option value="East Riding of Yorkshire"><option value="East Sussex"><option value="Essex"><option value="Fife"><option value="Fermanagh"><option value="Gloucestershire"><option value="Greater London"><option value="Greater Manchester"><option value="Gwent"><option value="Gwynedd"><option value="Hampshire"><option value="Herefordshire"><option value="Hertfordshire"><option value="Highland"><option value="Isle of Wight"><option value="Kent"><option value="Lancashire"><option value="Leicestershire"><option value="Lincolnshire"><option value="Londonderry"><option value="Merseyside"><option value="Mid Glamorgan"><option value="Norfolk"><option value="North Yorkshire"><option value="Northamptonshire"><option value="Northumberland"><option value="Nottinghamshire"><option value="Oxfordshire"><option value="Powys"><option value="Rutland"><option value="Shropshire"><option value="Somerset"><option value="South Glamorgan"><option value="South Yorkshire"><option value="Staffordshire"><option value="Suffolk"><option value="Surrey"><option value="Tyne and Wear"><option value="Tyrone"><option value="Warwickshire"><option value="West Glamorgan"><option value="West Midlands"><option value="West Sussex"><option value="West Yorkshire"><option value="Wiltshire"><option value="Worcestershire"></datalist>
+<div class="sel-bar" id="sel-bar"><span id="sel-count"></span><button class="go" onclick="emailSelected()">✉ Email selected (BCC)</button><button class="cl" onclick="clearSel()">Clear</button></div>
+<div class="enq-bar" id="enq-bar"></div>
   <div class="grid" id="tg"></div>
   <div class="list-view" id="tl"></div>
 </div>
@@ -511,6 +519,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
         </div>
       </div>
     </div>
+    <div class="sf"><label>County</label><input class="inp" style="padding-left:12px;min-width:130px" id="pcty" list="county-list" placeholder="Any county" oninput="renderP()"></div>
     <div class="sf"><label>Region</label><select class="fsel" id="pr" onchange="renderP()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
 <option value="East of England">East of England</option>
 <option value="London">London</option>
@@ -526,7 +535,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <option value="Nationwide / Remote">Nationwide / Remote</option></select></div>
     <div class="sf"><label>Virtual</label><select class="fsel" id="pv" onchange="renderP()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
     <div class="sf"><label>Min ★</label><select class="fsel" id="pst" onchange="renderP()"><option value="0">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5</option></select></div>
-    <div class="sf"><label>Show</label><select class="fsel" id="pac" onchange="renderP()"><option value="all">Show all</option><option value="active">Active only</option></select></div>
+    <div class="sf"><label>Show</label><select class="fsel" id="pac" onchange="renderP()"><option value="all">Show all</option><option value="active">Active only</option><option value="nocounty">Needs county</option></select></div>
     <div class="sf" style="flex:0"><label>&nbsp;</label><button class="clr" onclick="clearP()">Clear</button></div>
   </div>
   <div class="rmeta">
@@ -576,6 +585,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
         <div class="form-field"><label>Payment Terms</label><input class="finp" id="at-payment" placeholder="e.g. 30 days"></div>
         <div class="form-field form-full"><label>Region / Area</label>
           <div class="reg-checks" id="at-region"><label class="fc-item"><input type="checkbox" value="East Midlands"><span>East Midlands</span></label><label class="fc-item"><input type="checkbox" value="East of England"><span>East of England</span></label><label class="fc-item"><input type="checkbox" value="London"><span>London</span></label><label class="fc-item"><input type="checkbox" value="North East England"><span>North East England</span></label><label class="fc-item"><input type="checkbox" value="North West England"><span>North West England</span></label><label class="fc-item"><input type="checkbox" value="Northern Ireland"><span>Northern Ireland</span></label><label class="fc-item"><input type="checkbox" value="Scotland"><span>Scotland</span></label><label class="fc-item"><input type="checkbox" value="South East England"><span>South East England</span></label><label class="fc-item"><input type="checkbox" value="South West England"><span>South West England</span></label><label class="fc-item"><input type="checkbox" value="Wales"><span>Wales</span></label><label class="fc-item"><input type="checkbox" value="West Midlands"><span>West Midlands</span></label><label class="fc-item"><input type="checkbox" value="Yorkshire &amp; Humber"><span>Yorkshire &amp; Humber</span></label><label class="fc-item"><input type="checkbox" value="Nationwide / Remote"><span>Nationwide / Remote</span></label></div></div>
+        <div class="form-field"><label>County</label><input class="finp" id="at-county" list="county-list" placeholder="e.g. Staffordshire (auto-filled from postcode if left blank)"></div>
         <div class="form-field"><label>Base Postcode</label><input class="finp" id="at-postcode" placeholder="e.g. LS1 4AP" style="text-transform:uppercase"></div>
         <div class="form-field"><label>Travel Radius (miles)</label><input class="finp" id="at-radius" type="number" min="0" placeholder="e.g. 60"></div>
         <div class="form-field"><label>Virtual Delivery</label>
@@ -666,6 +676,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
         <div class="form-field"><label>Payment Terms</label><input class="finp" id="ab-payment" placeholder="e.g. 30 days"></div>
         <div class="form-field form-full"><label>Region / Area</label>
           <div class="reg-checks" id="ab-region"><label class="fc-item"><input type="checkbox" value="East Midlands"><span>East Midlands</span></label><label class="fc-item"><input type="checkbox" value="East of England"><span>East of England</span></label><label class="fc-item"><input type="checkbox" value="London"><span>London</span></label><label class="fc-item"><input type="checkbox" value="North East England"><span>North East England</span></label><label class="fc-item"><input type="checkbox" value="North West England"><span>North West England</span></label><label class="fc-item"><input type="checkbox" value="Northern Ireland"><span>Northern Ireland</span></label><label class="fc-item"><input type="checkbox" value="Scotland"><span>Scotland</span></label><label class="fc-item"><input type="checkbox" value="South East England"><span>South East England</span></label><label class="fc-item"><input type="checkbox" value="South West England"><span>South West England</span></label><label class="fc-item"><input type="checkbox" value="Wales"><span>Wales</span></label><label class="fc-item"><input type="checkbox" value="West Midlands"><span>West Midlands</span></label><label class="fc-item"><input type="checkbox" value="Yorkshire &amp; Humber"><span>Yorkshire &amp; Humber</span></label><label class="fc-item"><input type="checkbox" value="Nationwide / Remote"><span>Nationwide / Remote</span></label></div></div>
+        <div class="form-field"><label>County</label><input class="finp" id="ab-county" list="county-list" placeholder="e.g. Staffordshire (auto-filled from postcode if left blank)"></div>
         <div class="form-field"><label>Virtual Delivery</label>
           <select class="fsel-full" id="ab-virtual"><option value="">Unknown</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
         <div class="form-field"><label>Website</label><input class="finp" id="ab-website" type="url" placeholder="e.g. https://www.example.com"></div>
@@ -754,6 +765,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
           <div class="form-field"><label>Mileage Rate</label><input class="finp" id="et-mileage"></div>
           <div class="form-field"><label>Payment Terms</label><input class="finp" id="et-payment"></div>
           <div class="form-field form-full"><label>Region / Area</label><div class="reg-checks" id="et-region"><label class="fc-item"><input type="checkbox" value="East Midlands"><span>East Midlands</span></label><label class="fc-item"><input type="checkbox" value="East of England"><span>East of England</span></label><label class="fc-item"><input type="checkbox" value="London"><span>London</span></label><label class="fc-item"><input type="checkbox" value="North East England"><span>North East England</span></label><label class="fc-item"><input type="checkbox" value="North West England"><span>North West England</span></label><label class="fc-item"><input type="checkbox" value="Northern Ireland"><span>Northern Ireland</span></label><label class="fc-item"><input type="checkbox" value="Scotland"><span>Scotland</span></label><label class="fc-item"><input type="checkbox" value="South East England"><span>South East England</span></label><label class="fc-item"><input type="checkbox" value="South West England"><span>South West England</span></label><label class="fc-item"><input type="checkbox" value="Wales"><span>Wales</span></label><label class="fc-item"><input type="checkbox" value="West Midlands"><span>West Midlands</span></label><label class="fc-item"><input type="checkbox" value="Yorkshire &amp; Humber"><span>Yorkshire &amp; Humber</span></label><label class="fc-item"><input type="checkbox" value="Nationwide / Remote"><span>Nationwide / Remote</span></label></div></div>
+        <div class="form-field"><label>County</label><input class="finp" id="et-county" list="county-list" placeholder="e.g. Staffordshire (auto-filled from postcode if left blank)"></div>
         <div class="form-field"><label>Base Postcode</label><input class="finp" id="et-postcode" placeholder="e.g. LS1 4AP" style="text-transform:uppercase"></div>
         <div class="form-field"><label>Travel Radius (miles)</label><input class="finp" id="et-radius" type="number" min="0" placeholder="e.g. 60"></div>
           <div class="form-field"><label>Virtual Delivery</label><select class="fsel-full" id="et-virtual"><option value="">Unknown</option><option value="Yes">Yes</option><option value="No">No</option><option value="Partial">Partial</option></select></div>
@@ -837,6 +849,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
           <div class="form-field"><label>Discount</label><input class="finp" id="ep-discount"></div>
           <div class="form-field"><label>Payment Terms</label><input class="finp" id="ep-payment"></div>
           <div class="form-field form-full"><label>Region / Area</label><div class="reg-checks" id="ep-region"><label class="fc-item"><input type="checkbox" value="East Midlands"><span>East Midlands</span></label><label class="fc-item"><input type="checkbox" value="East of England"><span>East of England</span></label><label class="fc-item"><input type="checkbox" value="London"><span>London</span></label><label class="fc-item"><input type="checkbox" value="North East England"><span>North East England</span></label><label class="fc-item"><input type="checkbox" value="North West England"><span>North West England</span></label><label class="fc-item"><input type="checkbox" value="Northern Ireland"><span>Northern Ireland</span></label><label class="fc-item"><input type="checkbox" value="Scotland"><span>Scotland</span></label><label class="fc-item"><input type="checkbox" value="South East England"><span>South East England</span></label><label class="fc-item"><input type="checkbox" value="South West England"><span>South West England</span></label><label class="fc-item"><input type="checkbox" value="Wales"><span>Wales</span></label><label class="fc-item"><input type="checkbox" value="West Midlands"><span>West Midlands</span></label><label class="fc-item"><input type="checkbox" value="Yorkshire &amp; Humber"><span>Yorkshire &amp; Humber</span></label><label class="fc-item"><input type="checkbox" value="Nationwide / Remote"><span>Nationwide / Remote</span></label></div></div>
+        <div class="form-field"><label>County</label><input class="finp" id="ep-county" list="county-list" placeholder="e.g. Staffordshire (auto-filled from postcode if left blank)"></div>
           <div class="form-field"><label>Virtual Delivery</label><select class="fsel-full" id="ep-virtual"><option value="">Unknown</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
           <div class="form-field"><label>Website</label><input class="finp" id="ep-website" type="url"></div>
           <div class="form-field"><label>Active</label><select class="fsel-full" id="ep-active"><option value="Yes">Yes</option><option value="No">No — not to be used</option></select></div>
@@ -1268,14 +1281,22 @@ async function loadData(){
     let tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
     try{
       const hdr=(tRows.values&&tRows.values[7]||[]).map(x=>String(x||"").trim().toLowerCase());
-      if(hdr.length&&!hdr.includes("base postcode")){
+      if(hdr.length&&!(hdr[16]==="base postcode"&&hdr[17]==="travel radius (miles)"&&hdr[18]==="county")){
         const hr=(tRows.rowIndex||0)+8;
-        await graphPatch(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer%20Search/range(address='Q${hr}:R${hr}')`,{values:[["Base Postcode","Travel Radius (miles)"]]});
+        await graphPatch(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer%20Search/range(address='Q${hr}:S${hr}')`,{values:[["Base Postcode","Travel Radius (miles)","County"]]});
         tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
         console.log("Added missing Base Postcode / Travel Radius headers");
       }
     }catch(e){console.warn("Could not add postcode headers",e);}
-    const pRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Broker & Partner Search/usedRange`);
+    let pRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Broker & Partner Search/usedRange`);
+    try{
+      const ph=(pRows.values&&pRows.values[7]||[]).map(x=>String(x||"").trim().toLowerCase());
+      if(ph.length&&ph[14]!=="county"){
+        const hr=(pRows.rowIndex||0)+8;
+        await graphPatch(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Broker%20%26%20Partner%20Search/range(address='O${hr}:O${hr}')`,{values:[["County"]]});
+        pRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Broker & Partner Search/usedRange`);
+      }
+    }catch(e){console.warn("Could not add county header",e);}
     trainers=parseSheet(tRows,"trainer");
     partners=parseSheet(pRows,"partner");
 
@@ -1317,7 +1338,7 @@ function parseSheet(r,type){
     if(type==="trainer")out.push({
       _rowIdx:i,_xlRow:base+i+1,name:o.name,role:(o.role||"trainer").toLowerCase(),phone:o.phone,email:o.email,
       courses:(o["courses / qualifications"]||"").split(",").map(s=>s.trim()).filter(Boolean),
-      area:o["region / area"]||"",postcode:o["base postcode"]||"",radius:parseFloat(o["travel radius (miles)"])||0,dailyRate:o["day rate"]||"",halfDayRate:o["half day"]||"",
+      area:o["region / area"]||"",county:o.county||"",postcode:o["base postcode"]||"",radius:parseFloat(o["travel radius (miles)"])||0,dailyRate:o["day rate"]||"",halfDayRate:o["half day"]||"",
       mileage:o.mileage||"",paymentTerms:o["payment terms"]||"",virtualDelivery:o["virtual?"]||"",
       active:(o.active||"Yes").toLowerCase()!=="no",rating,notes:o.notes||"",
       lastUpdated:o["last updated"]||"",updatedBy:o["updated by"]||""
@@ -1326,7 +1347,7 @@ function parseSheet(r,type){
       _rowIdx:i,_xlRow:base+i+1,name:o["company name"]||o.name,phone:o.phone,email:o.email,discount:o.discount,
       courses:(o["courses offered"]||"").split(",").map(s=>s.trim()).filter(Boolean),
       area:o["region / area"]||"",virtualDelivery:o["virtual?"]||"",paymentTerms:o["payment terms"]||"",
-      active:(o.active||"Yes").toLowerCase()!=="no",website:o.website||"",
+      county:o.county||"",active:(o.active||"Yes").toLowerCase()!=="no",website:o.website||"",
       rating,notes:o.notes||"",lastUpdated:o["last updated"]||"",updatedBy:o["updated by"]||""
     });
   }
@@ -1405,6 +1426,27 @@ function copyContact(id){
   navigator.clipboard.writeText(text).then(()=>{const btn=el("cp-"+id);if(btn){btn.classList.add("copied");setTimeout(()=>btn.classList.remove("copied"),1500);}toast("Copied: "+d.name);}).catch(()=>toast("Copy not available"));
 }
 
+// ── Bulk email (BCC) ──────────────────────────────────────────────────────────
+const selT=new Set();let shownT=[];
+function selectedShown(){return shownT.filter(t=>selT.has(t._xlRow)&&t.active&&t.email);}
+function updateSelBar(){const n=selectedShown().length;el("sel-bar").style.display=n?"flex":"none";el("sel-count").textContent=n+" trainer"+(n!==1?"s":"")+" selected";}
+function toggleSel(id,on){if(on)selT.add(id);else selT.delete(id);updateSelBar();}
+function selectAllShown(on=true){shownT.filter(t=>t.active&&t.email).forEach(t=>{if(on)selT.add(t._xlRow);else selT.delete(t._xlRow);});renderT();}
+function clearSel(){selT.clear();renderT();}
+function emailSelected(){
+  const rows=selectedShown();
+  const addrs=[...new Set(rows.flatMap(t=>String(t.email).split(/[;,\s]+/).filter(x=>x.includes("@")).map(x=>x.toLowerCase())))];
+  if(!addrs.length){toast("No email addresses selected");return;}
+  const url="mailto:?bcc="+encodeURIComponent(addrs.join(",")).replace(/%40/g,"@").replace(/%2C/g,",");
+  if(url.length>1900){
+    try{navigator.clipboard.writeText(addrs.join("; "));}catch(e){}
+    toast("Too many addresses for one link – they've been copied. Paste them into BCC.",6000);
+    window.location.href="mailto:";return;
+  }
+  window.location.href=url;
+  toast("Opening a new email to "+addrs.length+" trainer"+(addrs.length!==1?"s":"")+" (BCC)",3500);
+}
+
 // ── Regions (multi-select) ────────────────────────────────────────────────────
 function getRegions(id){return Array.from(el(id).querySelectorAll("input:checked")).map(c=>c.value).join(", ");}
 function setRegions(id,val){const set=new Set(String(val||"").split(",").map(x=>x.trim().toLowerCase()).filter(Boolean));el(id).querySelectorAll("input").forEach(c=>{c.checked=set.has(c.value.toLowerCase());});}
@@ -1443,6 +1485,7 @@ function enquiryMatch(t){
   if(g){const d=miles(enq,g),r=t.radius||50;if(d<=r)return{dist:d,tag:Math.round(d)+" miles away"+(t.radius?"":" (default 50-mile range)")};return null;}
   const area=(t.area||"").toLowerCase();
   if(area.includes("nationwide"))return{dist:null,tag:"Nationwide / Remote"};
+  if(enq.county&&(t.county||"").toLowerCase().includes(enq.county.toLowerCase()))return{dist:null,tag:"Covers "+enq.county+" (no postcode set)"};
   if(enq.regionName&&area.includes(enq.regionName.toLowerCase()))return{dist:null,tag:"Covers "+enq.regionName+" (no postcode set)"};
   return null;
 }
@@ -1457,10 +1500,15 @@ async function setEnquiry(){
     if(!j.result){toast("Postcode not recognised");return;}
     const regionName=Array.isArray(j.result.country)?"":pcRegion(j.result);
     await geocodeTrainers();
-    enq={lat:j.result.latitude,lng:j.result.longitude,regionName,label:raw.toUpperCase()};
+    const _f=v=>Array.isArray(v)?v[0]:v;
+    enq={lat:j.result.latitude,lng:j.result.longitude,regionName,county:_f(j.result.admin_county)||_f(j.result.admin_district)||"",label:raw.toUpperCase()};
     el("t-sort").value="distance";
     renderT();
   }catch(e){toast("Postcode lookup unavailable – use the region filter instead");}
+}
+async function countyFromPostcode(pc){
+  try{const r=await fetch("https://api.postcodes.io/postcodes/"+encodeURIComponent(normPC(pc)));const j=await r.json();
+    return j.result?(j.result.admin_county||j.result.admin_district||""):"";}catch(e){return"";}
 }
 function clearEnquiry(){enq=null;el("tpc").value="";if(el("t-sort").value==="distance")el("t-sort").value="price";renderT();}
 
@@ -1495,12 +1543,13 @@ function buildTrainerCard(t,q,cf,isBest,sortMode){
     ${isBest?`<div class="best-badge">★ Best pick</div>`:""}
     ${!t.active?inactiveBanners():""}
     <div class="ch">
+      ${(t.active&&t.email)?`<input type="checkbox" class="sel-cb" title="Select to email" ${selT.has(t._xlRow)?"checked":""} onchange="toggleSel(${t._xlRow},this.checked)">`:`<span style="width:18px;flex:none"></span>`}
       <div class="av${isA?" assessor":""}">${initials(t.name)}</div>
       <div style="flex:1;min-width:0">
         <div class="cn">${hl(t.name,q)}</div>
         <span class="rbadge ${isA?"rb-a":"rb-t"}">${isA?"Assessor":"Trainer"}</span>
         ${t.rating?`<div class="stars">${starsHTML(t.rating)}</div>`:""}
-        ${t.area?`<div class="cs">${hl(t.area,q)}</div>`:""}
+        ${t.area?`<div class="cs">${hl([t.area,t.county].filter(Boolean).join(" · "),q)}</div>`:""}
         ${t._tag?`<div class="dist-tag">📍 ${t._tag}</div>`:""}
       </div>
     </div>
@@ -1530,7 +1579,7 @@ function buildPartnerCard(p,q,cf){
         <div class="cn">${hl(p.name,q)}</div>
         ${p.rating?`<div class="stars">${starsHTML(p.rating)}</div>`:""}
         ${p.discount?`<div class="cs" style="margin-top:4px"><span class="dp">▼ ${p.discount} discount</span></div>`:""}
-        ${p.area?`<div class="cs">${hl(p.area,q)}</div>`:""}
+        ${p.area?`<div class="cs">${hl([p.area,p.county].filter(Boolean).join(" · "),q)}</div>`:""}
       </div>
     </div>
     <div class="cb">
@@ -1549,18 +1598,21 @@ function buildPartnerCard(p,q,cf){
 function renderT(){
   const q=el("tq").value.trim().toLowerCase(),rf=el("tr").value,vf=el("tv").value.toLowerCase();
   const rof=el("tro").value.toLowerCase(),minSt=parseInt(el("tst").value)||0;
-  const tacv=el("tac").value,showInactive=tacv!=="active",sortMode=el("t-sort").value;
+  const tacv=el("tac").value,showInactive=tacv!=="active",sortMode=el("t-sort").value,cty=el("tcty").value.trim().toLowerCase();
   const selC=getCC("t");updateCCBtn("t",selC);
   let res=trainers.filter(t=>{
     if(!showInactive&&!t.active)return false;
     if(tacv==="noloc"&&t.postcode)return false;
+    if(tacv==="nocounty"&&t.county)return false;
+    if(cty&&!(t.county||"").toLowerCase().includes(cty))return false;
     t._dist=null;t._tag="";
     if(enq){const m=enquiryMatch(t);if(!m)return false;t._dist=m.dist;t._tag=m.tag;}
-    const mq=!q||[t.name,t.role,...t.courses,t.area,t.postcode,t.phone,t.email,t.notes].join(" ").toLowerCase().includes(q);
+    const mq=!q||[t.name,t.role,...t.courses,t.area,t.county,t.postcode,t.phone,t.email,t.notes].join(" ").toLowerCase().includes(q);
     let mc=true;if(selC.length)mc=tMatchMode==="any"?selC.some(c=>t.courses.includes(c)):selC.every(c=>t.courses.includes(c));
     return mq&&mc&&(!rf||(t.area||"").toLowerCase().includes(rf.toLowerCase()))&&(!vf||(t.virtualDelivery||"").toLowerCase().includes(vf))&&(!rof||t.role===rof)&&t.rating>=minSt;
   });
   res=sortArr(res,sortMode,"t");
+  shownT=res;updateSelBar();
   const eb=el("enq-bar");
   if(enq){eb.style.display="flex";eb.innerHTML=`📍 Showing trainers who can reach <b>${enq.label}</b>${enq.regionName?" ("+enq.regionName+")":""} – ${res.length} found. ${(()=>{const w=trainers.filter(t=>t.postcode),ok=w.filter(t=>GEO[normPC(t.postcode)]).length;return`<span style="opacity:.8">(${ok} of ${trainers.length} trainers have a located postcode${w.length>ok?", "+(w.length-ok)+" unrecognised":""}; the rest are matched by region)</span>`;})()}<button onclick="clearEnquiry()">Clear postcode</button>`;}else eb.style.display="none";
   const best=sortMode==="price"?res.find(t=>t.active&&parseRate(t.dailyRate)!==null):null;
@@ -1572,11 +1624,12 @@ function renderT(){
     el("tg").innerHTML=!res.length?'<div class="empty"><h3>No records found</h3><p>Try adjusting your search or filters</p></div>':res.map(t=>buildTrainerCard(t,q,selC,best&&t===best,sortMode)).join("");
   }else{
     el("tg").style.display="none";el("tl").style.display="block";
-    el("tl").innerHTML=!res.length?'<div class="empty"><h3>No records found</h3></div>':`<table class="list-table"><thead><tr><th>Name</th><th>Role</th><th>Region</th><th>Rate</th><th>Stars</th><th>Courses</th><th>Phone</th><th>Email</th><th></th></tr></thead><tbody>`+
+    el("tl").innerHTML=!res.length?'<div class="empty"><h3>No records found</h3></div>':`<table class="list-table"><thead><tr><th><input type="checkbox" class="sel-cb" title="Select all shown" onchange="selectAllShown(this.checked)"></th><th>Name</th><th>Role</th><th>Region</th><th>Rate</th><th>Stars</th><th>Courses</th><th>Phone</th><th>Email</th><th></th></tr></thead><tbody>`+
     res.map(t=>{
       const cpId="t"+(_cidx++);window._contactData[cpId]={name:t.name,phone:t.phone,email:t.email};
       const isBest=best&&t===best;
       return`<tr class="${isBest?"best-row":""}${!t.active?" inactive-row":""}">
+        <td>${(t.active&&t.email)?`<input type="checkbox" class="sel-cb" ${selT.has(t._xlRow)?"checked":""} onchange="toggleSel(${t._xlRow},this.checked)">`:""}</td>
         <td><span class="lt-name">${hl(t.name,q)}</span></td>
         <td><span class="rbadge ${t.role==="assessor"?"rb-a":"rb-t"}" style="font-size:9px">${t.role==="assessor"?"Asssr":"Trainer"}</span></td>
         <td style="font-size:12px;color:var(--tm)">${t.area||"—"}${t._tag?`<div class="dist-tag">📍 ${t._tag}</div>`:""}</td>
@@ -1594,11 +1647,13 @@ function renderT(){
 // ── Render partners ───────────────────────────────────────────────────────────
 function renderP(){
   const q=el("pq").value.trim().toLowerCase(),rf=el("pr").value,vf=el("pv").value.toLowerCase();
-  const minSt=parseInt(el("pst").value)||0,showInactive=el("pac").value==="all",sortMode=el("p-sort").value;
+  const minSt=parseInt(el("pst").value)||0,pacv=el("pac").value,showInactive=pacv!=="active",sortMode=el("p-sort").value,pcty=el("pcty").value.trim().toLowerCase();
   const selC=getCC("p");updateCCBtn("p",selC);
   let res=partners.filter(p=>{
     if(!showInactive&&!p.active)return false;
-    const mq=!q||[p.name,...p.courses,p.phone,p.email,p.discount,p.area,p.notes].join(" ").toLowerCase().includes(q);
+    if(pacv==="nocounty"&&p.county)return false;
+    if(pcty&&!(p.county||"").toLowerCase().includes(pcty))return false;
+    const mq=!q||[p.name,...p.courses,p.phone,p.email,p.discount,p.area,p.county,p.notes].join(" ").toLowerCase().includes(q);
     let mc=true;if(selC.length)mc=pMatchMode==="any"?selC.some(c=>p.courses.includes(c)):selC.every(c=>p.courses.includes(c));
     return mq&&mc&&(!rf||(p.area||"").toLowerCase().includes(rf.toLowerCase()))&&(!vf||(p.virtualDelivery||"").toLowerCase().includes(vf))&&p.rating>=minSt;
   });
@@ -1629,8 +1684,8 @@ function renderP(){
 }
 
 // ── Clear filters ─────────────────────────────────────────────────────────────
-function clearT(){el("tq").value="";el("tr").value="";el("tv").value="";setRole("");el("tst").value="0";el("tac").value="all";el("t-sort").value="price";el("tpc").value="";enq=null;clearCC("t");renderT();}
-function clearP(){el("pq").value="";el("pr").value="";el("pv").value="";el("pst").value="0";el("pac").value="all";el("p-sort").value="name";clearCC("p");renderP();}
+function clearT(){el("tq").value="";el("tr").value="";el("tcty").value="";el("tv").value="";setRole("");el("tst").value="0";el("tac").value="all";el("t-sort").value="price";el("tpc").value="";enq=null;clearCC("t");renderT();}
+function clearP(){el("pq").value="";el("pr").value="";el("pcty").value="";el("pv").value="";el("pst").value="0";el("pac").value="all";el("p-sort").value="name";clearCC("p");renderP();}
 
 // ── Quote rendering ───────────────────────────────────────────────────────────
 function renderQuoteDash(){
@@ -1722,11 +1777,11 @@ async function appendRow(fileId,sheetName,values){
 // ── Build trainer row array ───────────────────────────────────────────────────
 function trainerRowVals(f){
   // Must match Excel column order: Name,Role,Phone,Email,Courses,Region,DayRate,HalfDay,Mileage,Payment,Virtual,Active,Rating,Notes,LastUpdated,UpdatedBy
-  return[f.name,f.role,f.phone,f.email,f.courses.join(", "),f.area,f.dailyRate,f.halfDayRate,f.mileage,f.paymentTerms,f.virtual,f.active,f.rating,f.notes,nowStamp(),currentUser?.name||"",f.postcode||"",f.radius||""];
+  return[f.name,f.role,f.phone,f.email,f.courses.join(", "),f.area,f.dailyRate,f.halfDayRate,f.mileage,f.paymentTerms,f.virtual,f.active,f.rating,f.notes,nowStamp(),currentUser?.name||"",f.postcode||"",f.radius||"",f.county||""];
 }
 function brokerRowVals(f){
   // CompanyName,Phone,Email,Discount,Courses,Region,Virtual,Payment,Active,Website,Rating,Notes,LastUpdated,UpdatedBy
-  return[f.name,f.phone,f.email,f.discount,f.courses.join(", "),f.area,f.virtual,f.paymentTerms,f.active,f.website,f.rating,f.notes,nowStamp(),currentUser?.name||""];
+  return[f.name,f.phone,f.email,f.discount,f.courses.join(", "),f.area,f.virtual,f.paymentTerms,f.active,f.website,f.rating,f.notes,nowStamp(),currentUser?.name||"",f.county||""];
 }
 function quoteRowVals(f){
   // ID,SalesPerson,Date,Company,Contact,Course,Value,Stage,Comments,LastUpdated,UpdatedBy
@@ -1751,11 +1806,12 @@ async function submitAddTrainer(){
   const btn=el("at-submit-btn");btn.disabled=true;btn.textContent="Saving…";
   try{
     const f={name,role:el("at-role").value,phone:el("at-phone").value.trim(),email:el("at-email").value.trim(),
-      courses:getFormCourses("at-courses"),area:getRegions("at-region"),postcode:el("at-postcode").value.trim().toUpperCase(),radius:el("at-radius").value,
+      courses:getFormCourses("at-courses"),area:getRegions("at-region"),postcode:el("at-postcode").value.trim().toUpperCase(),radius:el("at-radius").value,county:el("at-county").value.trim(),
       dailyRate:el("at-rate").value,halfDayRate:el("at-halfrate").value,
       mileage:el("at-mileage").value.trim(),paymentTerms:el("at-payment").value.trim(),
       virtual:el("at-virtual").value,active:el("at-active").value,
       rating:el("at-rating").value,notes:el("at-notes").value.trim()};
+    if(f.postcode&&!f.county)f.county=await countyFromPostcode(f.postcode);
     await appendRow(tFileId,"Trainer Search",trainerRowVals(f));
     // Refresh data
     const tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
@@ -1779,7 +1835,7 @@ async function submitAddBroker(){
   try{
     const f={name,phone:el("ab-phone").value.trim(),email:el("ab-email").value.trim(),
       discount:el("ab-discount").value.trim(),courses:getFormCourses("ab-courses"),
-      area:getRegions("ab-region"),virtual:el("ab-virtual").value,
+      area:getRegions("ab-region"),county:el("ab-county").value.trim(),virtual:el("ab-virtual").value,
       paymentTerms:el("ab-payment").value.trim(),active:el("ab-active").value,
       website:el("ab-website").value.trim(),rating:el("ab-rating").value,
       notes:el("ab-notes").value.trim()};
@@ -1814,7 +1870,7 @@ function loadEditTrainer(rowIdx){
   el("et-row-idx").value=rowIdx;
   el("et-name").value=t.name;el("et-role").value=t.role||"trainer";
   el("et-phone").value=t.phone;el("et-email").value=t.email;
-  el("et-postcode").value=t.postcode||"";el("et-radius").value=t.radius||"";el("et-rate").value=t.dailyRate;el("et-halfrate").value=t.halfDayRate;
+  el("et-postcode").value=t.postcode||"";el("et-county").value=t.county||"";el("et-radius").value=t.radius||"";el("et-rate").value=t.dailyRate;el("et-halfrate").value=t.halfDayRate;
   el("et-mileage").value=t.mileage;el("et-payment").value=t.paymentTerms;
   setRegions("et-region",t.area);el("et-virtual").value=t.virtualDelivery;
   el("et-active").value=t.active?"Yes":"No";
@@ -1831,12 +1887,13 @@ async function submitEditTrainer(){
   const btn=el("et-submit-btn");btn.disabled=true;btn.textContent="Saving…";
   try{
     const f={name,role:el("et-role").value,phone:el("et-phone").value.trim(),email:el("et-email").value.trim(),
-      courses:getFormCourses("et-courses"),area:getRegions("et-region"),postcode:el("et-postcode").value.trim().toUpperCase(),radius:el("et-radius").value,
+      courses:getFormCourses("et-courses"),area:getRegions("et-region"),postcode:el("et-postcode").value.trim().toUpperCase(),radius:el("et-radius").value,county:el("et-county").value.trim(),
       dailyRate:el("et-rate").value,halfDayRate:el("et-halfrate").value,
       mileage:el("et-mileage").value.trim(),paymentTerms:el("et-payment").value.trim(),
       virtual:el("et-virtual").value,active:el("et-active").value,
       rating:el("et-rating").value,notes:el("et-notes").value.trim()};
     // rowIdx is 0-based in our array; Excel data starts at row 9 (rows 1-8 are header/filters)
+    if(f.postcode&&!f.county)f.county=await countyFromPostcode(f.postcode);
     const orig=trainers.find(x=>x._rowIdx===rowIdx);
     if(!orig)throw new Error("Could not find the original record – refresh and try again.");
     await writeRowChecked(tFileId,"Trainer Search",orig._xlRow,orig.name,trainerRowVals(f));
@@ -1857,7 +1914,7 @@ function loadEditBroker(rowIdx){
   el("ep-row-idx").value=rowIdx;
   el("ep-name").value=p.name;el("ep-phone").value=p.phone;el("ep-email").value=p.email;
   el("ep-discount").value=p.discount;el("ep-payment").value=p.paymentTerms;
-  setRegions("ep-region",p.area);el("ep-virtual").value=p.virtualDelivery;
+  setRegions("ep-region",p.area);el("ep-county").value=p.county||"";el("ep-virtual").value=p.virtualDelivery;
   el("ep-website").value=p.website;el("ep-active").value=p.active?"Yes":"No";
   el("ep-rating").value=p.rating||"";el("ep-notes").value=p.notes||"";
   setFormCourses("ep-courses",p.courses);
@@ -1873,7 +1930,7 @@ async function submitEditBroker(){
   try{
     const f={name,phone:el("ep-phone").value.trim(),email:el("ep-email").value.trim(),
       discount:el("ep-discount").value.trim(),courses:getFormCourses("ep-courses"),
-      area:getRegions("ep-region"),virtual:el("ep-virtual").value,
+      area:getRegions("ep-region"),county:el("ep-county").value.trim(),virtual:el("ep-virtual").value,
       paymentTerms:el("ep-payment").value.trim(),active:el("ep-active").value,
       website:el("ep-website").value.trim(),rating:el("ep-rating").value,
       notes:el("ep-notes").value.trim()};
@@ -1891,7 +1948,7 @@ async function submitEditBroker(){
 
 // ── Quote form ────────────────────────────────────────────────────────────────
 function resetForm(prefix){
-  ["name","phone","email","rate","halfrate","mileage","payment","notes","postcode","radius"].forEach(f=>{const e=el(prefix+"-"+f);if(e)e.value="";});
+  ["name","phone","email","rate","halfrate","mileage","payment","notes","postcode","radius","county","discount","website"].forEach(f=>{const e=el(prefix+"-"+f);if(e)e.value="";});
   ["virtual","active","role","rating"].forEach(f=>{const e=el(prefix+"-"+f);if(e)e.selectedIndex=0;});
   setRegions(prefix+"-region","");
   el(prefix+"-courses")?.querySelectorAll("input").forEach(cb=>cb.checked=false);
