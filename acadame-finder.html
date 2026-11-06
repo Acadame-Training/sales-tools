@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="color-scheme" content="light">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Acadame — Sales Tools</title>
@@ -241,6 +242,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .empty h3{font-size:16px;color:var(--tm);font-weight:600;margin-bottom:6px}.empty p{font-size:13px}
 
 /* Modal */
+#edit-modal-body .form-section{box-shadow:none;border:none;padding:.5rem 0;margin:0}
+.fc-item,.fc-item span{color:#0F172A !important;text-transform:none !important;letter-spacing:0 !important;font-size:13px !important;font-weight:500 !important}
+.fc-wrap,.fc-search,.fc-search input{color:#0F172A}
+.fc-search input{background:#fff}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
 .modal-overlay.open{display:flex}
 .modal{background:var(--cd);border-radius:var(--ra);box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:560px;max-height:90vh;overflow-y:auto}
@@ -398,7 +403,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <option value="Yorkshire & Humber">Yorkshire & Humber</option>
 <option value="Nationwide / Remote">Nationwide / Remote</option></select></div>
     <div class="sf"><label>Virtual</label><select class="fsel" id="tv" onchange="renderT()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
-    <div class="sf"><label>Role</label><select class="fsel" id="tro" onchange="renderT()"><option value="">All</option><option value="trainer">Trainer</option><option value="assessor">Assessor</option></select></div>
+    <div class="sf" style="flex:0;min-width:auto"><label>Role</label><input type="hidden" id="tro" value=""><div class="view-toggle" id="role-toggle"><button type="button" class="vt-btn active" data-v="" onclick="setRole('')">All</button><button type="button" class="vt-btn" data-v="trainer" onclick="setRole('trainer')">Trainer</button><button type="button" class="vt-btn" data-v="assessor" onclick="setRole('assessor')">Assessor</button></div></div>
     <div class="sf"><label>Min ★</label><select class="fsel" id="tst" onchange="renderT()"><option value="0">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5</option></select></div>
     <div class="sf"><label>Show</label><select class="fsel" id="tac" onchange="renderT()"><option value="all">Show all</option><option value="active">Active only</option></select></div>
     <div class="sf" style="flex:0"><label>&nbsp;</label><button class="clr" onclick="clearT()">Clear</button></div>
@@ -847,7 +852,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 13l3-1L12 4l-2-2-8 8-1 3z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Save Changes
           </button>
-          <button class="btn-secondary" onclick="el('et-form').style.display='none'">Cancel</button>
+          <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
         </div>
       </div>
     </div>
@@ -946,7 +951,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 13l3-1L12 4l-2-2-8 8-1 3z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Save Changes
           </button>
-          <button class="btn-secondary" onclick="el('ep-form').style.display='none'">Cancel</button>
+          <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
         </div>
       </div>
     </div>
@@ -1116,6 +1121,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 </div><!-- end app -->
 
 <!-- Edit quote modal -->
+<div class="modal-overlay" id="edit-modal" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal" style="max-width:820px">
+    <div class="modal-hdr"><h3 id="edit-modal-title">Edit</h3><button class="modal-close" onclick="closeEditModal()">✕</button></div>
+    <div id="edit-modal-body" style="padding:1rem 1.25rem"></div>
+  </div>
+</div>
 <div class="modal-overlay" id="eq-modal">
   <div class="modal">
     <div class="modal-hdr"><h3>Edit Quote</h3><button class="modal-close" onclick="closeModal('eq-modal')">✕</button></div>
@@ -1341,6 +1352,7 @@ async function loadData(){
 
 function parseSheet(r,type){
   const rows=r.values;if(!rows||rows.length<9)return[];
+  const base=(r.rowIndex||0);
   const hdrs=rows[7].map(h=>String(h||"").trim().toLowerCase());
   const out=[];
   for(let i=8;i<rows.length;i++){
@@ -1348,7 +1360,7 @@ function parseSheet(r,type){
     const o={};hdrs.forEach((h,ci)=>{o[h]=String(row[ci]??"").trim()||""});
     const rating=parseInt(o.rating||"0")||0;
     if(type==="trainer")out.push({
-      _rowIdx:i,name:o.name,role:(o.role||"trainer").toLowerCase(),phone:o.phone,email:o.email,
+      _rowIdx:i,_xlRow:base+i+1,name:o.name,role:(o.role||"trainer").toLowerCase(),phone:o.phone,email:o.email,
       courses:(o["courses / qualifications"]||"").split(",").map(s=>s.trim()).filter(Boolean),
       area:o["region / area"]||"",dailyRate:o["day rate"]||"",halfDayRate:o["half day"]||"",
       mileage:o.mileage||"",paymentTerms:o["payment terms"]||"",virtualDelivery:o["virtual?"]||"",
@@ -1356,7 +1368,7 @@ function parseSheet(r,type){
       lastUpdated:o["last updated"]||"",updatedBy:o["updated by"]||""
     });
     else out.push({
-      _rowIdx:i,name:o["company name"]||o.name,phone:o.phone,email:o.email,discount:o.discount,
+      _rowIdx:i,_xlRow:base+i+1,name:o["company name"]||o.name,phone:o.phone,email:o.email,discount:o.discount,
       courses:(o["courses offered"]||"").split(",").map(s=>s.trim()).filter(Boolean),
       area:o["region / area"]||"",virtualDelivery:o["virtual?"]||"",paymentTerms:o["payment terms"]||"",
       active:(o.active||"Yes").toLowerCase()!=="no",website:o.website||"",
@@ -1596,7 +1608,7 @@ function renderP(){
 }
 
 // ── Clear filters ─────────────────────────────────────────────────────────────
-function clearT(){el("tq").value="";el("tr").value="";el("tv").value="";el("tro").value="";el("tst").value="0";el("tac").value="all";el("t-sort").value="price";clearCC("t");renderT();}
+function clearT(){el("tq").value="";el("tr").value="";el("tv").value="";setRole("");el("tst").value="0";el("tac").value="all";el("t-sort").value="price";clearCC("t");renderT();}
 function clearP(){el("pq").value="";el("pr").value="";el("pv").value="";el("pst").value="0";el("pac").value="all";el("p-sort").value="name";clearCC("p");renderP();}
 
 // ── Quote rendering ───────────────────────────────────────────────────────────
@@ -1665,10 +1677,19 @@ async function writeRow(fileId,sheetName,rowIdx,values){
   );
 }
 
+async function writeRowChecked(fileId,sheetName,excelRow,expectedName,values){
+  const endCol=String.fromCharCode(64+values.length);
+  const base=`/drives/${driveId}/items/${fileId}/workbook/worksheets/${encodeURIComponent(sheetName)}`;
+  const cur=await graph(`${base}/range(address='A${excelRow}:A${excelRow}')`);
+  const found=String((cur.values&&cur.values[0]&&cur.values[0][0])||"").trim();
+  if(found!==String(expectedName).trim())throw new Error("The spreadsheet has changed since it was loaded (row "+excelRow+" now holds '"+found+"'). Refresh the page and try again – nothing was saved.");
+  await graphPatch(`${base}/range(address='A${excelRow}:${endCol}${excelRow}')`,{values:[values]});
+}
+
 async function appendRow(fileId,sheetName,values){
   // Get used range to find next empty row
   const used=await graph(`/drives/${driveId}/items/${fileId}/workbook/worksheets/${encodeURIComponent(sheetName)}/usedRange`);
-  const nextRow=(used.rowCount||1)+1;
+  const nextRow=(used.rowIndex||0)+(used.rowCount||1)+1;
   const endCol=String.fromCharCode(64+values.length);
   await graphPatch(
     `/drives/${driveId}/items/${fileId}/workbook/worksheets/${encodeURIComponent(sheetName)}/range(address='A${nextRow}:${endCol}${nextRow}')`,
@@ -1776,7 +1797,7 @@ function loadEditTrainer(rowIdx){
   el("et-active").value=t.active?"Yes":"No";
   el("et-rating").value=t.rating||"";el("et-notes").value=t.notes||"";
   setFormCourses("et-courses",t.courses);
-  el("et-form").style.display="block";el("et-form").scrollIntoView({behavior:"smooth",block:"start"});
+  openEditModal("et-form","Edit Trainer / Assessor");
   clearAlert("et-alert");
 }
 
@@ -1793,14 +1814,15 @@ async function submitEditTrainer(){
       virtual:el("et-virtual").value,active:el("et-active").value,
       rating:el("et-rating").value,notes:el("et-notes").value.trim()};
     // rowIdx is 0-based in our array; Excel data starts at row 9 (rows 1-8 are header/filters)
-    const excelRow=rowIdx+1; // parseSheet stores the actual row index from the values array (0-based from row 0)
-    await writeRow(tFileId,"Trainer Search",excelRow+8,trainerRowVals(f)); // +8 because data starts at row 9
+    const orig=trainers.find(x=>x._rowIdx===rowIdx);
+    if(!orig)throw new Error("Could not find the original record – refresh and try again.");
+    await writeRowChecked(tFileId,"Trainer Search",orig._xlRow,orig.name,trainerRowVals(f));
     const tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
     trainers=parseSheet(tRows,"trainer");
-    setAlert("et-alert","✓ Saved successfully!","ok");
-    toast("Updated: "+name);
+    clearAlert("et-alert");closeEditModal();
     el("et-results").innerHTML="";el("et-search").value="";
-    setTimeout(()=>{el("et-form").style.display="none";clearAlert("et-alert");},1500);
+    renderT();showTab("trainers");
+    toast("✓ "+name+" updated successfully",3500);
   }catch(e){setAlert("et-alert","Error saving: "+e.message,"err");}
   finally{btn.disabled=false;btn.innerHTML='<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 13l3-1L12 4l-2-2-8 8-1 3z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Save Changes';}
 }
@@ -1815,7 +1837,7 @@ function loadEditBroker(rowIdx){
   el("ep-website").value=p.website;el("ep-active").value=p.active?"Yes":"No";
   el("ep-rating").value=p.rating||"";el("ep-notes").value=p.notes||"";
   setFormCourses("ep-courses",p.courses);
-  el("ep-form").style.display="block";el("ep-form").scrollIntoView({behavior:"smooth",block:"start"});
+  openEditModal("ep-form","Edit Broker / Partner");
   clearAlert("ep-alert");
 }
 
@@ -1831,13 +1853,15 @@ async function submitEditBroker(){
       paymentTerms:el("ep-payment").value.trim(),active:el("ep-active").value,
       website:el("ep-website").value.trim(),rating:el("ep-rating").value,
       notes:el("ep-notes").value.trim()};
-    await writeRow(tFileId,"Broker & Partner Search",rowIdx+8+1,brokerRowVals(f));
+    const orig=partners.find(x=>x._rowIdx===rowIdx);
+    if(!orig)throw new Error("Could not find the original record – refresh and try again.");
+    await writeRowChecked(tFileId,"Broker & Partner Search",orig._xlRow,orig.name,brokerRowVals(f));
     const pRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Broker & Partner Search/usedRange`);
     partners=parseSheet(pRows,"partner");
-    setAlert("ep-alert","✓ Saved successfully!","ok");
-    toast("Updated: "+name);
+    clearAlert("ep-alert");closeEditModal();
     el("ep-results").innerHTML="";el("ep-search").value="";
-    setTimeout(()=>{el("ep-form").style.display="none";clearAlert("ep-alert");},1500);
+    renderP();showTab("partners");
+    toast("✓ "+name+" updated successfully",3500);
   }catch(e){setAlert("ep-alert","Error saving: "+e.message,"err");}
   finally{btn.disabled=false;btn.innerHTML='<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 13l3-1L12 4l-2-2-8 8-1 3z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Save Changes';}
 }
@@ -1919,6 +1943,24 @@ function loadEditQuote(rowIdx){
 
 async function submitEditQuote(){}
 
+function openEditModal(formId,title){
+  const m=el("edit-modal-body");
+  ["et-form","ep-form"].forEach(id=>{el(id).style.display="none";});
+  if(el(formId).parentNode!==m)m.appendChild(el(formId));
+  el(formId).style.display="block";
+  el("edit-modal-title").textContent=title;
+  el("edit-modal").classList.add("open");
+  m.parentNode.scrollTop=0;
+}
+function closeEditModal(){
+  el("edit-modal").classList.remove("open");
+  ["et-form","ep-form"].forEach(id=>{el(id).style.display="none";});
+}
+function setRole(v){
+  el("tro").value=v;
+  document.querySelectorAll("#role-toggle .vt-btn").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
+  renderT();
+}
 function closeModal(id){el(id).classList.remove("open");}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
