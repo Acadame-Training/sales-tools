@@ -578,6 +578,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
   <div class="sub-tabs">
     <button class="sub-tab active" onclick="showSubTab('add','trainer')" id="stab-add-trainer">Add Trainer / Assessor</button>
     <button class="sub-tab" onclick="showSubTab('add','broker')" id="stab-add-broker">Add Broker / Partner</button>
+    <button class="sub-tab" onclick="showSubTab('add','import')" id="stab-add-import">Import postcodes</button>
   </div>
 
   <!-- ADD TRAINER FORM -->
@@ -587,6 +588,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
       <h3>Add New Trainer or Assessor</h3>
       <div class="form-grid">
         <div class="form-field"><label>Full Name <span class="req">*</span></label><input class="finp" id="at-name" type="text" placeholder="e.g. John Smith"></div>
+        <div class="form-field"><label>Company / Trading Name</label><input class="finp" id="at-company" placeholder="e.g. Evolve Training Services"></div>
         <div class="form-field"><label>Role <span class="req">*</span></label>
           <select class="fsel-full" id="at-role"><option value="trainer">Trainer</option><option value="assessor">Assessor</option></select></div>
         <div class="form-field"><label>Phone</label><input class="finp" id="at-phone" type="tel" placeholder="e.g. 07700 900000"></div>
@@ -676,6 +678,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
   </div>
 
   <!-- ADD BROKER FORM -->
+  <div id="sub-add-import" style="display:none">
+    <div class="form-section">
+      <h3 style="margin:0 0 6px;font-size:16px">Import postcodes / company names</h3>
+      <p style="font-size:13px;color:var(--tm);margin:0 0 12px">Upload a reviewed CSV with the columns <b>Name, Company, Postcode, County</b> (optional: <b>Radius</b>). Trainers are matched by exact name, checked, then only the location and company columns are updated. Nothing is written until you press Apply.</p>
+      <input type="file" id="imp-file" accept=".csv,text/csv" onchange="impLoad(this.files[0])">
+      <label style="display:flex;gap:8px;align-items:center;margin:12px 0;font-size:13px;text-transform:none;letter-spacing:0;color:var(--tx);font-weight:500"><input type="checkbox" id="imp-over" style="width:auto" onchange="impLoad(window._impFile)"> Overwrite values that already exist</label>
+      <div id="imp-preview" style="overflow:auto;max-height:420px"></div>
+      <div id="imp-alert"></div>
+      <button class="btn-primary" id="imp-go" style="display:none;margin-top:12px" onclick="impApply()">Apply changes</button>
+    </div>
+  </div>
   <div id="sub-add-broker" style="display:none">
     <div class="f-alert" id="ab-alert"></div>
     <div class="form-section">
@@ -769,6 +782,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
         <div class="form-grid">
           <input type="hidden" id="et-row-idx">
           <div class="form-field"><label>Full Name <span class="req">*</span></label><input class="finp" id="et-name" type="text"></div>
+        <div class="form-field"><label>Company / Trading Name</label><input class="finp" id="et-company" placeholder="e.g. Evolve Training Services"></div>
           <div class="form-field"><label>Role</label><select class="fsel-full" id="et-role"><option value="trainer">Trainer</option><option value="assessor">Assessor</option></select></div>
           <div class="form-field"><label>Phone</label><input class="finp" id="et-phone" type="tel"></div>
           <div class="form-field"><label>Email</label><input class="finp" id="et-email" type="email"></div>
@@ -1293,9 +1307,9 @@ async function loadData(){
     let tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
     try{
       const hdr=(tRows.values&&tRows.values[7]||[]).map(x=>String(x||"").trim().toLowerCase());
-      if(hdr.length&&!(hdr[16]==="base postcode"&&hdr[17]==="travel radius (miles)"&&hdr[18]==="county")){
+      if(hdr.length&&!(hdr[16]==="base postcode"&&hdr[17]==="travel radius (miles)"&&hdr[18]==="county"&&hdr[19]==="company / trading name")){
         const hr=(tRows.rowIndex||0)+8;
-        await graphPatch(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer%20Search/range(address='Q${hr}:S${hr}')`,{values:[["Base Postcode","Travel Radius (miles)","County"]]});
+        await graphPatch(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer%20Search/range(address='Q${hr}:T${hr}')`,{values:[["Base Postcode","Travel Radius (miles)","County","Company / Trading Name"]]});
         tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
         console.log("Added missing Base Postcode / Travel Radius headers");
       }
@@ -1350,7 +1364,7 @@ function parseSheet(r,type){
     if(type==="trainer")out.push({
       _rowIdx:i,_xlRow:base+i+1,name:o.name,role:(o.role||"trainer").toLowerCase(),phone:o.phone,email:o.email,
       courses:(o["courses / qualifications"]||"").split(",").map(s=>s.trim()).filter(Boolean),
-      area:o["region / area"]||"",county:o.county||"",postcode:o["base postcode"]||"",radius:parseFloat(o["travel radius (miles)"])||0,dailyRate:o["day rate"]||"",halfDayRate:o["half day"]||"",
+      area:o["region / area"]||"",company:o["company / trading name"]||"",county:o.county||"",postcode:o["base postcode"]||"",radius:parseFloat(o["travel radius (miles)"])||0,dailyRate:o["day rate"]||"",halfDayRate:o["half day"]||"",
       mileage:o.mileage||"",paymentTerms:o["payment terms"]||"",virtualDelivery:o["virtual?"]||"",
       active:(o.active||"Yes").toLowerCase()!=="no",rating,notes:o.notes||"",
       lastUpdated:o["last updated"]||"",updatedBy:o["updated by"]||""
@@ -1436,6 +1450,67 @@ function copyContact(id){
   const d=window._contactData[id];if(!d)return;
   const text=`${d.name}${d.phone?"\nPhone: "+d.phone:""}${d.email?"\nEmail: "+d.email:""}`;
   navigator.clipboard.writeText(text).then(()=>{const btn=el("cp-"+id);if(btn){btn.classList.add("copied");setTimeout(()=>btn.classList.remove("copied"),1500);}toast("Copied: "+d.name);}).catch(()=>toast("Copy not available"));
+}
+
+// ── Import postcodes / company names (reviewed CSV) ───────────────────────────
+let impPlan=[];
+function parseCSV(txt){
+  const rows=[];let row=[],cur="",q=false;
+  for(let i=0;i<txt.length;i++){const c=txt[i];
+    if(q){if(c==='"'){if(txt[i+1]==='"'){cur+='"';i++;}else q=false;}else cur+=c;}
+    else if(c==='"')q=true;
+    else if(c===","){row.push(cur);cur="";}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&txt[i+1]==="\n")i++;row.push(cur);cur="";if(row.some(x=>x.trim()!==""))rows.push(row);row=[];}
+    else cur+=c;}
+  row.push(cur);if(row.some(x=>x.trim()!==""))rows.push(row);return rows;
+}
+async function impLoad(file){
+  if(!file)return;window._impFile=file;
+  const rows=parseCSV((await file.text()).replace(/^\uFEFF/,""));
+  if(rows.length<2){el("imp-preview").innerHTML="<p>No rows found.</p>";return;}
+  const h=rows[0].map(x=>x.trim().toLowerCase());
+  const ix=n=>h.findIndex(x=>x===n||x.startsWith(n));
+  const iN=ix("name"),iC=ix("company"),iP=ix("postcode"),iT=ix("county"),iR=ix("radius");
+  if(iN<0){el("imp-preview").innerHTML="<p>The CSV needs a Name column.</p>";return;}
+  const over=el("imp-over").checked;impPlan=[];
+  rows.slice(1).forEach(r=>{
+    const name=(r[iN]||"").trim();if(!name)return;
+    const t=trainers.find(x=>x.name.trim().toLowerCase()===name.toLowerCase());
+    const want={company:iC>=0?(r[iC]||"").trim():"",postcode:iP>=0?(r[iP]||"").trim().toUpperCase():"",county:iT>=0?(r[iT]||"").trim():"",radius:iR>=0?(r[iR]||"").trim():""};
+    if(!t){impPlan.push({name,status:"No trainer with this exact name",want,skip:true});return;}
+    const set={},notes=[];
+    ["company","postcode","county","radius"].forEach(k=>{
+      if(!want[k])return;const cur=String(t[k]||"").trim();
+      if(!cur||over||cur.toLowerCase()===want[k].toLowerCase()){if(cur.toLowerCase()!==want[k].toLowerCase())set[k]=want[k];}
+      else notes.push(k+" already set ("+cur+")");
+    });
+    impPlan.push({name,t,want,set,status:Object.keys(set).length?"Will update "+Object.keys(set).join(", ")+(notes.length?" · skipped: "+notes.join(", "):""):(notes.length?"Nothing to change · "+notes.join(", "):"Already up to date"),skip:!Object.keys(set).length});
+  });
+  const n=impPlan.filter(x=>!x.skip).length;
+  el("imp-preview").innerHTML=`<p style="font-size:13px"><b>${n}</b> trainer${n!==1?"s":""} will be updated, ${impPlan.length-n} skipped.</p><table class="list-table"><thead><tr><th>Name</th><th>Company</th><th>Postcode</th><th>County</th><th>Result</th></tr></thead><tbody>`+impPlan.map(x=>`<tr style="${x.skip?"opacity:.55":""}"><td>${x.name}</td><td>${x.want.company||"—"}</td><td>${x.want.postcode||"—"}</td><td>${x.want.county||"—"}</td><td style="font-size:12px">${x.status}</td></tr>`).join("")+"</tbody></table>";
+  el("imp-go").style.display=n?"inline-flex":"none";el("imp-go").textContent="Apply "+n+" change"+(n!==1?"s":"");
+}
+async function impApply(){
+  const todo=impPlan.filter(x=>!x.skip);if(!todo.length)return;
+  const btn=el("imp-go");btn.disabled=true;btn.textContent="Saving…";
+  let done=0;const errs=[];
+  const base=`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer%20Search`;
+  for(const x of todo){
+    try{
+      const t=x.t,r=t._xlRow;
+      const cur=await graph(`${base}/range(address='A${r}:A${r}')`);
+      if(String((cur.values&&cur.values[0]&&cur.values[0][0])||"").trim()!==t.name.trim())throw new Error("row changed – refresh and retry");
+      const v={postcode:t.postcode||"",radius:t.radius||"",county:t.county||"",company:t.company||"",...x.set};
+      await graphPatch(`${base}/range(address='Q${r}:T${r}')`,{values:[[v.postcode,v.radius,v.county,v.company]]});
+      await graphPatch(`${base}/range(address='O${r}:P${r}')`,{values:[[nowStamp(),currentUser?.name||""]]});
+      done++;
+    }catch(e){errs.push(x.name+": "+e.message);}
+  }
+  try{const tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);trainers=parseSheet(tRows,"trainer");await geocodeTrainers();renderT();}catch(e){}
+  btn.disabled=false;btn.style.display="none";impPlan=[];
+  el("imp-preview").innerHTML="";
+  setAlert("imp-alert",`✓ ${done} trainer${done!==1?"s":""} updated.`+(errs.length?" Problems: "+errs.join("; "):""),errs.length?"warn":"ok");
+  toast("✓ Import finished – "+done+" updated",4000);
 }
 
 // ── Bulk email (BCC) ──────────────────────────────────────────────────────────
@@ -1559,6 +1634,7 @@ function buildTrainerCard(t,q,cf,isBest,sortMode){
       <div class="av${isA?" assessor":""}">${initials(t.name)}</div>
       <div style="flex:1;min-width:0">
         <div class="cn">${hl(t.name,q)}</div>
+        ${t.company?`<div class="cs" style="font-style:italic">${hl(t.company,q)}</div>`:""}
         <span class="rbadge ${isA?"rb-a":"rb-t"}">${isA?"Assessor":"Trainer"}</span>
         ${t.rating?`<div class="stars">${starsHTML(t.rating)}</div>`:""}
         ${t.area?`<div class="cs">${hl([t.area,t.county].filter(Boolean).join(" · "),q)}</div>`:""}
@@ -1619,7 +1695,7 @@ function renderT(){
     if(cty&&!(t.county||"").toLowerCase().includes(cty))return false;
     t._dist=null;t._tag="";
     if(enq){const m=enquiryMatch(t);if(!m)return false;t._dist=m.dist;t._tag=m.tag;}
-    const mq=!q||[t.name,t.role,...t.courses,t.area,t.county,t.postcode,t.phone,t.email,t.notes].join(" ").toLowerCase().includes(q);
+    const mq=!q||[t.name,t.company,t.role,...t.courses,t.area,t.county,t.postcode,t.phone,t.email,t.notes].join(" ").toLowerCase().includes(q);
     let mc=true;if(selC.length)mc=tMatchMode==="any"?selC.some(c=>t.courses.includes(c)):selC.every(c=>t.courses.includes(c));
     return mq&&mc&&(!rf||(t.area||"").toLowerCase().includes(rf.toLowerCase()))&&(!vf||(t.virtualDelivery||"").toLowerCase().includes(vf))&&(!rof||t.role===rof)&&t.rating>=minSt;
   });
@@ -1642,7 +1718,7 @@ function renderT(){
       const isBest=best&&t===best;
       return`<tr class="${isBest?"best-row":""}${!t.active?" inactive-row":""}">
         <td>${(t.active&&t.email)?`<input type="checkbox" class="sel-cb" ${selT.has(t._xlRow)?"checked":""} onchange="toggleSel(${t._xlRow},this.checked)">`:""}</td>
-        <td><span class="lt-name">${hl(t.name,q)}</span></td>
+        <td><span class="lt-name">${hl(t.name,q)}</span>${t.company?`<div style="font-size:11px;color:var(--tm);font-style:italic">${hl(t.company,q)}</div>`:""}</td>
         <td><span class="rbadge ${t.role==="assessor"?"rb-a":"rb-t"}" style="font-size:9px">${t.role==="assessor"?"Asssr":"Trainer"}</span></td>
         <td style="font-size:12px;color:var(--tm)">${t.area||"—"}${t._tag?`<div class="dist-tag">📍 ${t._tag}</div>`:""}</td>
         <td style="font-size:12px;font-weight:600;color:${isBest?"#16A34A":"inherit"}">${t.dailyRate?"£"+t.dailyRate:"—"}</td>
@@ -1789,7 +1865,7 @@ async function appendRow(fileId,sheetName,values){
 // ── Build trainer row array ───────────────────────────────────────────────────
 function trainerRowVals(f){
   // Must match Excel column order: Name,Role,Phone,Email,Courses,Region,DayRate,HalfDay,Mileage,Payment,Virtual,Active,Rating,Notes,LastUpdated,UpdatedBy
-  return[f.name,f.role,f.phone,f.email,f.courses.join(", "),f.area,f.dailyRate,f.halfDayRate,f.mileage,f.paymentTerms,f.virtual,f.active,f.rating,f.notes,nowStamp(),currentUser?.name||"",f.postcode||"",f.radius||"",f.county||""];
+  return[f.name,f.role,f.phone,f.email,f.courses.join(", "),f.area,f.dailyRate,f.halfDayRate,f.mileage,f.paymentTerms,f.virtual,f.active,f.rating,f.notes,nowStamp(),currentUser?.name||"",f.postcode||"",f.radius||"",f.county||"",f.company||""];
 }
 function brokerRowVals(f){
   // CompanyName,Phone,Email,Discount,Courses,Region,Virtual,Payment,Active,Website,Rating,Notes,LastUpdated,UpdatedBy
@@ -1818,7 +1894,7 @@ async function submitAddTrainer(){
   const btn=el("at-submit-btn");btn.disabled=true;btn.textContent="Saving…";
   try{
     const f={name,role:el("at-role").value,phone:el("at-phone").value.trim(),email:el("at-email").value.trim(),
-      courses:getFormCourses("at-courses"),area:getRegions("at-region"),postcode:el("at-postcode").value.trim().toUpperCase(),radius:el("at-radius").value,county:el("at-county").value.trim(),
+      courses:getFormCourses("at-courses"),area:getRegions("at-region"),postcode:el("at-postcode").value.trim().toUpperCase(),radius:el("at-radius").value,county:el("at-county").value.trim(),company:el("at-company").value.trim(),
       dailyRate:el("at-rate").value,halfDayRate:el("at-halfrate").value,
       mileage:el("at-mileage").value.trim(),paymentTerms:el("at-payment").value.trim(),
       virtual:el("at-virtual").value,active:el("at-active").value,
@@ -1882,7 +1958,7 @@ function loadEditTrainer(rowIdx){
   el("et-row-idx").value=rowIdx;
   el("et-name").value=t.name;el("et-role").value=t.role||"trainer";
   el("et-phone").value=t.phone;el("et-email").value=t.email;
-  el("et-postcode").value=t.postcode||"";el("et-county").value=t.county||"";el("et-radius").value=t.radius||"";el("et-rate").value=t.dailyRate;el("et-halfrate").value=t.halfDayRate;
+  el("et-postcode").value=t.postcode||"";el("et-county").value=t.county||"";el("et-company").value=t.company||"";el("et-radius").value=t.radius||"";el("et-rate").value=t.dailyRate;el("et-halfrate").value=t.halfDayRate;
   el("et-mileage").value=t.mileage;el("et-payment").value=t.paymentTerms;
   setRegions("et-region",t.area);el("et-virtual").value=t.virtualDelivery;
   el("et-active").value=t.active?"Yes":"No";
@@ -1899,7 +1975,7 @@ async function submitEditTrainer(){
   const btn=el("et-submit-btn");btn.disabled=true;btn.textContent="Saving…";
   try{
     const f={name,role:el("et-role").value,phone:el("et-phone").value.trim(),email:el("et-email").value.trim(),
-      courses:getFormCourses("et-courses"),area:getRegions("et-region"),postcode:el("et-postcode").value.trim().toUpperCase(),radius:el("et-radius").value,county:el("et-county").value.trim(),
+      courses:getFormCourses("et-courses"),area:getRegions("et-region"),postcode:el("et-postcode").value.trim().toUpperCase(),radius:el("et-radius").value,county:el("et-county").value.trim(),company:el("et-company").value.trim(),
       dailyRate:el("et-rate").value,halfDayRate:el("et-halfrate").value,
       mileage:el("et-mileage").value.trim(),paymentTerms:el("et-payment").value.trim(),
       virtual:el("et-virtual").value,active:el("et-active").value,
@@ -1960,7 +2036,7 @@ async function submitEditBroker(){
 
 // ── Quote form ────────────────────────────────────────────────────────────────
 function resetForm(prefix){
-  ["name","phone","email","rate","halfrate","mileage","payment","notes","postcode","radius","county","discount","website"].forEach(f=>{const e=el(prefix+"-"+f);if(e)e.value="";});
+  ["name","phone","email","rate","halfrate","mileage","payment","notes","postcode","radius","county","company","discount","website"].forEach(f=>{const e=el(prefix+"-"+f);if(e)e.value="";});
   ["virtual","active","role","rating"].forEach(f=>{const e=el(prefix+"-"+f);if(e)e.selectedIndex=0;});
   setRegions(prefix+"-region","");
   el(prefix+"-courses")?.querySelectorAll("input").forEach(cb=>cb.checked=false);
