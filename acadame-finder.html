@@ -427,7 +427,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <option value="Yorkshire & Humber">Yorkshire & Humber</option>
 <option value="Nationwide / Remote">Nationwide / Remote</option></select></div>
     <div class="sf sp2"><label>Virtual</label><select class="fsel" id="tv" onchange="renderT()"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
-    <div class="sf sp4"><label>Enquiry postcode</label><div style="display:flex;gap:6px"><input class="inp" style="padding-left:12px;text-transform:uppercase" id="tpc" placeholder="e.g. LS1 4AP" onkeydown="if(event.key===\'Enter\')setEnquiry()"><button class="clr" onclick="setEnquiry()">Find</button></div></div>
+    <div class="sf sp4"><label>Enquiry location (postcode or town)</label><div style="display:flex;gap:6px"><input class="inp" style="padding-left:12px;text-transform:uppercase" id="tpc" placeholder="e.g. LS1 4AP or Stafford" onkeydown="if(event.key===\'Enter\')setEnquiry()"><button class="clr" onclick="setEnquiry()">Find</button></div></div>
     <div class="sf sp3"><label>Role</label><input type="hidden" id="tro" value=""><div class="view-toggle" id="role-toggle"><button type="button" class="vt-btn active" data-v="" onclick="setRole('')">All</button><button type="button" class="vt-btn" data-v="trainer" onclick="setRole('trainer')">Trainer</button><button type="button" class="vt-btn" data-v="assessor" onclick="setRole('assessor')">Assessor</button></div></div>
     <div class="sf sp2"><label>Min ★</label><select class="fsel" id="tst" onchange="renderT()"><option value="0">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5</option></select></div>
     <div class="sf sp2"><label>Show</label><select class="fsel" id="tac" onchange="renderT()"><option value="all">Show all</option><option value="active">Active only</option><option value="noloc">Needs postcode</option><option value="nocounty">Needs county</option></select></div>
@@ -531,6 +531,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
         </div>
       </div>
     </div>
+    <div class="sf sp4"><label>Training location (postcode or town)</label><div style="display:flex;gap:6px"><input class="inp" style="padding-left:12px" id="ppc" placeholder="e.g. ST16 or Stafford" onkeydown="if(event.key===\'Enter\')setEnquiryP()"><button class="clr" onclick="setEnquiryP()">Find</button></div></div>
     <div class="sf sp2"><label>County</label><input class="inp" style="padding-left:12px;min-width:130px" id="pcty" list="county-list" placeholder="Any county" oninput="renderP()"></div>
     <div class="sf sp2"><label>Region</label><select class="fsel" id="pr" onchange="renderP()"><option value="">All regions</option><option value="East Midlands">East Midlands</option>
 <option value="East of England">East of England</option>
@@ -553,7 +554,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
   <div class="rmeta">
     <span class="rc" id="pc2"></span>
     <div class="view-controls">
-      <select class="sort-sel" id="p-sort" onchange="renderP()"><option value="name">A–Z</option><option value="region">By region</option><option value="rating">Highest rated</option></select>
+      <select class="sort-sel" id="p-sort" onchange="renderP()"><option value="name">A–Z</option><option value="match">Best location match</option><option value="region">By region</option><option value="rating">Highest rated</option></select>
       <div class="view-toggle">
         <button class="vt-btn active" id="p-grid-btn" onclick="setView('p','grid')" title="Grid">
           <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
@@ -565,6 +566,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
       <span class="rf" id="pf"></span>
     </div>
   </div>
+  <div class="enq-bar" id="enq-bar-p"></div>
   <div class="grid" id="pg"></div>
   <div class="list-view" id="pl"></div>
 </div>
@@ -1603,7 +1605,7 @@ function setRegions(id,val){const set=new Set(String(val||"").split(",").map(x=>
 const GEO={};let enq=null;const DEFAULT_RADIUS=30;
 const REGION_MAP={"East Midlands":"East Midlands","East of England":"East of England","London":"London","North East":"North East England","North West":"North West England","South East":"South East England","South West":"South West England","West Midlands":"West Midlands","Yorkshire and The Humber":"Yorkshire & Humber"};
 const normPC=p=>String(p||"").toUpperCase().replace(/\s+/g,"");
-function pcRegion(r){return r.region?(REGION_MAP[r.region]||r.region):(r.country&&r.country!=="England"?r.country:"");}
+function pcRegion(r){const _k=r.region&&Object.keys(REGION_MAP).find(k=>k.toLowerCase()===String(r.region).toLowerCase());return r.region?(REGION_MAP[_k]||r.region):(r.country&&r.country!=="England"?r.country:"");}
 try{Object.assign(GEO,JSON.parse(localStorage.getItem("acadame_geo_v1")||"{}"));}catch(e){}
 function saveGeo(){try{const ok={};Object.keys(GEO).forEach(k=>{if(GEO[k])ok[k]=GEO[k];});localStorage.setItem("acadame_geo_v1",JSON.stringify(ok));}catch(e){}}
 async function geocodeTrainers(){
@@ -1637,22 +1639,36 @@ function enquiryMatch(t){
   if(enq.regionName&&area.includes(enq.regionName.toLowerCase()))return{dist:null,tag:"Covers "+enq.regionName+" (no postcode set)"};
   return null;
 }
+async function resolveLocation(raw){
+  const _f=v=>Array.isArray(v)?v[0]:v;
+  const pc=normPC(raw);
+  const get=async u=>{try{const r=await fetch(u);return await r.json();}catch(e){return null;}};
+  let j=await get("https://api.postcodes.io/postcodes/"+encodeURIComponent(pc));
+  if(!j||!j.result)j=await get("https://api.postcodes.io/outcodes/"+encodeURIComponent(pc));
+  if(j&&j.result){
+    const r=j.result;
+    return{lat:r.latitude,lng:r.longitude,regionName:Array.isArray(r.country)?"":pcRegion(r),county:_f(r.admin_county)||_f(r.admin_district)||"",label:raw.toUpperCase()};
+  }
+  // not a postcode - try as a town / place name
+  j=await get("https://api.postcodes.io/places?limit=1&q="+encodeURIComponent(raw));
+  const r=j&&j.result&&j.result[0];
+  if(r){
+    const reg=pcRegion({region:r.region,country:r.country});
+    return{lat:r.latitude,lng:r.longitude,regionName:reg,county:r.county_unitary||r.district_borough||"",label:(r.name_1||raw)};
+  }
+  return null;
+}
 async function setEnquiry(){
   const raw=el("tpc").value.trim();
   if(!raw){clearEnquiry();return;}
-  const pc=normPC(raw);
   try{
-    let r=await fetch("https://api.postcodes.io/postcodes/"+encodeURIComponent(pc));
-    let j=await r.json();
-    if(!j.result){r=await fetch("https://api.postcodes.io/outcodes/"+encodeURIComponent(pc));j=await r.json();}
-    if(!j.result){toast("Postcode not recognised");return;}
-    const regionName=Array.isArray(j.result.country)?"":pcRegion(j.result);
+    const loc=await resolveLocation(raw);
+    if(!loc){toast("Location not recognised – try a postcode or town");return;}
     await geocodeTrainers();
-    const _f=v=>Array.isArray(v)?v[0]:v;
-    enq={lat:j.result.latitude,lng:j.result.longitude,regionName,county:_f(j.result.admin_county)||_f(j.result.admin_district)||"",label:raw.toUpperCase()};
+    enq=loc;
     el("t-sort").value="distance";
     renderT();
-  }catch(e){toast("Postcode lookup unavailable – use the region filter instead");}
+  }catch(e){toast("Location lookup unavailable – use the region filter instead");}
 }
 async function countyFromPostcode(pc){
   try{const r=await fetch("https://api.postcodes.io/postcodes/"+encodeURIComponent(normPC(pc)));const j=await r.json();
@@ -1665,6 +1681,7 @@ function sortArr(arr,mode,type){
   return[...arr].sort((a,b)=>{
     if(mode==="price"&&type==="t"){if(a.active!==b.active)return a.active?-1:1;const ra=parseRate(a.dailyRate),rb=parseRate(b.dailyRate);if(ra!==null&&rb!==null)return ra-rb;if(ra!==null)return-1;if(rb!==null)return 1;return 0;}
     if(mode==="distance"&&type==="t")return(a._dist==null?1e9:a._dist)-(b._dist==null?1e9:b._dist);
+    if(mode==="match"&&type==="p")return((a._rank||9)-(b._rank||9))||(a.name||"").localeCompare(b.name||"");
     if(mode==="name")return(a.name||"").localeCompare(b.name||"");
     if(mode==="region")return(a.area||"").localeCompare(b.area||"");
     if(mode==="rating")return(b.rating||0)-(a.rating||0);
@@ -1729,6 +1746,7 @@ function buildPartnerCard(p,q,cf){
         ${p.rating?`<div class="stars">${starsHTML(p.rating)}</div>`:""}
         ${p.discount?`<div class="cs" style="margin-top:4px"><span class="dp">▼ ${p.discount} discount</span></div>`:""}
         ${p.area?`<div class="cs">${hl([p.area,p.county].filter(Boolean).join(" · "),q)}</div>`:""}
+        ${p._tag?`<div class="dist-tag">📍 ${p._tag}</div>`:""}
       </div>
     </div>
     <div class="cb">
@@ -1799,6 +1817,7 @@ function renderP(){
   const minSt=parseInt(el("pst").value)||0,pacv=el("pac").value,showInactive=pacv!=="active",sortMode=el("p-sort").value,pcty=el("pcty").value.trim().toLowerCase();
   const selC=getCC("p");updateCCBtn("p",selC);
   let res=partners.filter(p=>{
+    p._rank=0;p._tag="";
     if(!showInactive&&!p.active)return false;
     if(pacv==="nocounty"&&p.county)return false;
     if(pcty&&!(p.county||"").toLowerCase().includes(pcty))return false;
@@ -1806,6 +1825,12 @@ function renderP(){
     let mc=true;if(selC.length)mc=pMatchMode==="any"?selC.some(c=>p.courses.includes(c)):selC.every(c=>p.courses.includes(c));
     return mq&&mc&&(!rf||(p.area||"").toLowerCase().includes(rf.toLowerCase()))&&(!vf||(p.virtualDelivery||"").toLowerCase().includes(vf))&&p.rating>=minSt;
   });
+  if(enqP){
+    res=res.filter(p=>{const m=enquiryMatchP(p);if(!m)return false;p._rank=m.rank;p._tag=m.tag;return true;});
+  }
+  const eb=el("enq-bar-p");
+  if(enqP){eb.style.display="flex";eb.innerHTML=`📍 Brokers for <b>${enqP.label}</b>${enqP.county?` · ${enqP.county}`:""}${enqP.regionName?` · ${enqP.regionName}`:""} — county matches first, then region, then nationwide <button onclick="clearEnquiryP()">Clear location</button>`;}
+  else{eb.style.display="none";eb.innerHTML="";}
   res=sortArr(res,sortMode,"p");
   el("pc2").textContent=res.length+" partner"+(res.length!==1?"s":"")+" found";
   el("pf").textContent=loadedAt?"Loaded "+loadedAt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):"";
@@ -1819,7 +1844,7 @@ function renderP(){
       const cpId="p"+(_cidx++);window._contactData[cpId]={name:p.name,phone:p.phone,email:p.email};
       return`<tr class="${!p.active?" inactive-row":""}">
         <td><span class="lt-name">${hl(p.name,q)}</span></td>
-        <td style="font-size:12px;color:var(--tm)">${p.area||"—"}</td>
+        <td style="font-size:12px;color:var(--tm)">${p.area||"—"}${p._tag?`<div class="dist-tag">📍 ${p._tag}</div>`:""}</td>
         <td><div class="lt-stars">${ltStars(p.rating)}</div></td>
         <td style="font-size:12px">${p.discount||"—"}</td>
         <td><span class="lt-courses" title="${p.courses.join(", ")}">${p.courses.slice(0,3).join(", ")}${p.courses.length>3?" +"+(p.courses.length-3):""}</span></td>
@@ -1834,7 +1859,26 @@ function renderP(){
 
 // ── Clear filters ─────────────────────────────────────────────────────────────
 function clearT(){el("tq").value="";el("tr").value="";el("tcty").value="";el("tv").value="";setRole("");el("tst").value="0";el("tac").value="all";el("t-sort").value="price";el("tpc").value="";enq=null;clearCC("t");renderT();}
-function clearP(){el("pq").value="";el("pr").value="";el("pcty").value="";el("pv").value="";el("pst").value="0";el("pac").value="all";el("p-sort").value="name";clearCC("p");renderP();}
+let enqP=null;
+function enquiryMatchP(p){
+  const a=(p.area||"").toLowerCase(),c=(p.county||"").toLowerCase();
+  if(a.includes("nationwide")||a.includes("remote"))return{rank:3,tag:"Nationwide"};
+  const ec=(enqP.county||"").toLowerCase();
+  if(ec&&c&&(c.includes(ec)||ec.includes(c)))return{rank:1,tag:"Covers "+p.county};
+  if(enqP.regionName&&a.includes(enqP.regionName.toLowerCase()))return{rank:2,tag:"Covers "+enqP.regionName};
+  return null;
+}
+async function setEnquiryP(){
+  const raw=el("ppc").value.trim();
+  if(!raw){clearEnquiryP();return;}
+  try{
+    const loc=await resolveLocation(raw);
+    if(!loc){toast("Location not recognised – try a postcode or town");return;}
+    enqP=loc;el("p-sort").value="match";renderP();
+  }catch(e){toast("Location lookup unavailable – use the region filter instead");}
+}
+function clearEnquiryP(){enqP=null;el("ppc").value="";if(el("p-sort").value==="match")el("p-sort").value="name";renderP();}
+function clearP(){el("pq").value="";el("pr").value="";el("pcty").value="";el("pv").value="";el("pst").value="0";el("pac").value="all";el("p-sort").value="name";el("ppc").value="";enqP=null;clearCC("p");renderP();}
 
 // ── Quote rendering ───────────────────────────────────────────────────────────
 function renderQuoteDash(){
