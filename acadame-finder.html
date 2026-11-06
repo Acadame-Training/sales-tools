@@ -1263,7 +1263,16 @@ async function loadData(){
     showLoading("Loading trainer data…");
     const tFile=await graph(`/drives/${driveId}/root:/${FOLDER}/${TFILE}`);
     tFileId=tFile.id;
-    const tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
+    let tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
+    try{
+      const hdr=(tRows.values&&tRows.values[7]||[]).map(x=>String(x||"").trim().toLowerCase());
+      if(hdr.length&&!hdr.includes("base postcode")){
+        const hr=(tRows.rowIndex||0)+8;
+        await graphPatch(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer%20Search/range(address='Q${hr}:R${hr}')`,{values:[["Base Postcode","Travel Radius (miles)"]]});
+        tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
+        console.log("Added missing Base Postcode / Travel Radius headers");
+      }
+    }catch(e){console.warn("Could not add postcode headers",e);}
     const pRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Broker & Partner Search/usedRange`);
     trainers=parseSheet(tRows,"trainer");
     partners=parseSheet(pRows,"partner");
@@ -1404,7 +1413,7 @@ const REGION_MAP={"East Midlands":"East Midlands","East of England":"East of Eng
 const normPC=p=>String(p||"").toUpperCase().replace(/\s+/g,"");
 function pcRegion(r){return r.region?(REGION_MAP[r.region]||r.region):(r.country&&r.country!=="England"?r.country:"");}
 try{Object.assign(GEO,JSON.parse(localStorage.getItem("acadame_geo_v1")||"{}"));}catch(e){}
-function saveGeo(){try{localStorage.setItem("acadame_geo_v1",JSON.stringify(GEO));}catch(e){}}
+function saveGeo(){try{const ok={};Object.keys(GEO).forEach(k=>{if(GEO[k])ok[k]=GEO[k];});localStorage.setItem("acadame_geo_v1",JSON.stringify(ok));}catch(e){}}
 async function geocodeTrainers(){
   const need=[...new Set(trainers.map(t=>normPC(t.postcode)).filter(pc=>pc&&!(pc in GEO)))];
   for(let i=0;i<need.length;i+=100){
@@ -1413,13 +1422,22 @@ async function geocodeTrainers(){
       const r=await fetch("https://api.postcodes.io/postcodes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({postcodes:chunk})});
       const j=await r.json();
       (j.result||[]).forEach(x=>{const k=normPC(x.query);GEO[k]=x.result?{lat:x.result.latitude,lng:x.result.longitude,region:pcRegion(x.result)}:null;});
-    }catch(e){console.warn("Postcode lookup failed",e);return;}
+    }catch(e){
+      console.warn("Bulk postcode lookup failed, trying one by one",e);
+      for(const pc of chunk){
+        try{const r=await fetch("https://api.postcodes.io/postcodes/"+encodeURIComponent(pc));const j=await r.json();
+          GEO[pc]=j.result?{lat:j.result.latitude,lng:j.result.longitude,region:pcRegion(j.result)}:(r.status===404?null:undefined);
+          if(GEO[pc]===undefined)delete GEO[pc];
+        }catch(e2){console.warn("Lookup failed for",pc,e2);}
+      }
+    }
   }
   saveGeo();
 }
 function miles(a,b){const R=3958.8,rad=x=>x*Math.PI/180;const dLat=rad(b.lat-a.lat),dLng=rad(b.lng-a.lng);const h=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLng/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
 function enquiryMatch(t){
-  const g=GEO[normPC(t.postcode)];
+  const key=normPC(t.postcode),g=GEO[key];
+  if(key&&g===null)return{dist:null,tag:"⚠ Postcode '"+t.postcode+"' not recognised – please check"};
   if(g){const d=miles(enq,g),r=t.radius||50;if(d<=r)return{dist:d,tag:Math.round(d)+" miles away"+(t.radius?"":" (default 50-mile range)")};return null;}
   const area=(t.area||"").toLowerCase();
   if(area.includes("nationwide"))return{dist:null,tag:"Nationwide / Remote"};
@@ -1542,7 +1560,7 @@ function renderT(){
   });
   res=sortArr(res,sortMode,"t");
   const eb=el("enq-bar");
-  if(enq){eb.style.display="flex";eb.innerHTML=`📍 Showing trainers who can reach <b>${enq.label}</b>${enq.regionName?" ("+enq.regionName+")":""} – ${res.length} found. Trainers with no postcode are matched by region.<button onclick="clearEnquiry()">Clear postcode</button>`;}else eb.style.display="none";
+  if(enq){eb.style.display="flex";eb.innerHTML=`📍 Showing trainers who can reach <b>${enq.label}</b>${enq.regionName?" ("+enq.regionName+")":""} – ${res.length} found. ${(()=>{const w=trainers.filter(t=>t.postcode),ok=w.filter(t=>GEO[normPC(t.postcode)]).length;return`<span style="opacity:.8">(${ok} of ${trainers.length} trainers have a located postcode${w.length>ok?", "+(w.length-ok)+" unrecognised":""}; the rest are matched by region)</span>`;})()}<button onclick="clearEnquiry()">Clear postcode</button>`;}else eb.style.display="none";
   const best=sortMode==="price"?res.find(t=>t.active&&parseRate(t.dailyRate)!==null):null;
   el("tc2").textContent=res.length+" record"+(res.length!==1?"s":"")+" found";
   el("t-sort-hint").style.display=sortMode==="price"&&res.some(t=>t.active&&parseRate(t.dailyRate)!==null)?"flex":"none";
@@ -1741,6 +1759,7 @@ async function submitAddTrainer(){
     const tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
     trainers=parseSheet(tRows,"trainer");
     await geocodeTrainers();
+    if(f.postcode&&GEO[normPC(f.postcode)]===null)toast("⚠ Saved, but postcode "+f.postcode+" was not recognised – please check it",6000);
     setAlert("at-alert","✓ Trainer added successfully!","ok");
     toast("Added: "+name);
     resetForm("at");
@@ -1822,9 +1841,10 @@ async function submitEditTrainer(){
     const tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
     trainers=parseSheet(tRows,"trainer");
     await geocodeTrainers();
+    const _bad=f.postcode&&GEO[normPC(f.postcode)]===null;
     clearAlert("et-alert");closeEditModal();
     renderT();showTab("trainers");
-    toast("✓ "+name+" updated successfully",3500);
+    toast(_bad?"⚠ Saved, but postcode "+f.postcode+" was not recognised – please check it":"✓ "+name+" updated successfully",_bad?6000:3500);
   }catch(e){setAlert("et-alert","Error saving: "+e.message,"err");}
   finally{btn.disabled=false;btn.innerHTML='<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 13l3-1L12 4l-2-2-8 8-1 3z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Save Changes';}
 }
