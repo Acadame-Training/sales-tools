@@ -686,6 +686,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
       <label style="display:flex;gap:8px;align-items:center;margin:12px 0;font-size:13px;text-transform:none;letter-spacing:0;color:var(--tx);font-weight:500"><input type="checkbox" id="imp-over" style="width:auto" onchange="impLoad(window._impFile)"> Overwrite values that already exist</label>
       <div id="imp-preview" style="overflow:auto;max-height:420px"></div>
       <div id="imp-alert"></div>
+      <hr style="border:none;border-top:1px solid var(--bs);margin:18px 0">
+      <h3 style="margin:0 0 6px;font-size:15px">Fill missing counties from postcodes</h3>
+      <p style="font-size:13px;color:var(--tm);margin:0 0 10px">Looks up the county for every trainer who has a base postcode but no county, and saves it. Existing counties are never changed.</p>
+      <button class="clr" id="cty-btn" onclick="fillCounties()">Fill missing counties</button>
+      <div id="cty-alert" style="margin-top:10px"></div>
+      <hr style="border:none;border-top:1px solid var(--bs);margin:18px 0">
+      <h3 style="margin:0 0 6px;font-size:15px">Set a default travel radius</h3>
+      <p style="font-size:13px;color:var(--tm);margin:0 0 10px">Puts <b>30</b> miles in the Travel Radius for every trainer who has none. Radii that are already set are never changed.</p>
+      <button class="clr" id="rad-btn" onclick="fillRadius()">Set blank radius to 30 miles</button>
+      <div id="rad-alert" style="margin-top:10px"></div>
       <button class="btn-primary" id="imp-go" style="display:none;margin-top:12px" onclick="impApply()">Apply changes</button>
     </div>
   </div>
@@ -1514,6 +1524,56 @@ async function impApply(){
   toast("✓ Import finished – "+done+" updated",4000);
 }
 
+async function fillRadius(){
+  const btn=el("rad-btn");btn.disabled=true;btn.textContent="Saving…";
+  let done=0;const errs=[];
+  try{
+    const tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
+    const fresh=parseSheet(tRows,"trainer");
+    const need=fresh.filter(t=>!t.radius);
+    const base=`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer%20Search`;
+    for(const t of need){
+      try{await graphPatch(`${base}/range(address='R${t._xlRow}:R${t._xlRow}')`,{values:[[DEFAULT_RADIUS]]});done++;}
+      catch(e){errs.push(t.name+": "+e.message);}
+    }
+    const again=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);
+    trainers=parseSheet(again,"trainer");renderT();
+  }catch(e){errs.push(e.message);}
+  btn.disabled=false;btn.textContent="Set blank radius to 30 miles";
+  setAlert("rad-alert",`${done} trainer${done!==1?"s":""} set to ${DEFAULT_RADIUS} miles.`+(errs.length?" Problems: "+errs.join("; "):""),errs.length?"warn":"ok");
+}
+async function fillCounties(){
+  const need=trainers.filter(t=>t.postcode&&!t.county);
+  const out=el("cty-alert");
+  if(!need.length){setAlert("cty-alert","Every trainer with a postcode already has a county.","ok");return;}
+  const btn=el("cty-btn");btn.disabled=true;btn.textContent="Looking up…";
+  const found={};let lookupErr="";
+  const uniq=[...new Set(need.map(t=>normPC(t.postcode)))];
+  for(let i=0;i<uniq.length;i+=100){
+    try{
+      const r=await fetch("https://api.postcodes.io/postcodes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({postcodes:uniq.slice(i,i+100)})});
+      const j=await r.json();
+      (j.result||[]).forEach(x=>{if(x.result)found[normPC(x.query)]=x.result.admin_county||x.result.admin_district||"";});
+    }catch(e){lookupErr="The postcode service could not be reached ("+e.message+").";}
+  }
+  const base=`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer%20Search`;
+  let done=0;const bad=[],errs=[];
+  for(const t of need){
+    const c=found[normPC(t.postcode)];
+    if(!c){bad.push(t.name+" ("+t.postcode+")");continue;}
+    try{
+      const cur=await graph(`${base}/range(address='A${t._xlRow}:A${t._xlRow}')`);
+      if(String((cur.values&&cur.values[0]&&cur.values[0][0])||"").trim()!==t.name.trim())throw new Error("row changed");
+      await graphPatch(`${base}/range(address='S${t._xlRow}:S${t._xlRow}')`,{values:[[c]]});
+      await graphPatch(`${base}/range(address='O${t._xlRow}:P${t._xlRow}')`,{values:[[nowStamp(),currentUser?.name||""]]});
+      done++;
+    }catch(e){errs.push(t.name+": "+e.message);}
+  }
+  try{const tRows=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/Trainer Search/usedRange`);trainers=parseSheet(tRows,"trainer");renderT();}catch(e){}
+  btn.disabled=false;btn.textContent="Fill missing counties";
+  setAlert("cty-alert",`${done} of ${need.length} counties filled.${lookupErr?" "+lookupErr:""}${bad.length?" Not recognised: "+bad.join(", ")+".":""}${errs.length?" Problems: "+errs.join("; "):""}`,done?"ok":"warn");
+}
+
 // ── Bulk email (BCC) ──────────────────────────────────────────────────────────
 const selT=new Set();let shownT=[];
 function selectedShown(){return shownT.filter(t=>selT.has(t._xlRow)&&t.active&&t.email);}
@@ -1540,7 +1600,7 @@ function getRegions(id){return Array.from(el(id).querySelectorAll("input:checked
 function setRegions(id,val){const set=new Set(String(val||"").split(",").map(x=>x.trim().toLowerCase()).filter(Boolean));el(id).querySelectorAll("input").forEach(c=>{c.checked=set.has(c.value.toLowerCase());});}
 
 // ── Postcode lookup (postcodes.io – free UK service, no AI) ───────────────────
-const GEO={};let enq=null;
+const GEO={};let enq=null;const DEFAULT_RADIUS=30;
 const REGION_MAP={"East Midlands":"East Midlands","East of England":"East of England","London":"London","North East":"North East England","North West":"North West England","South East":"South East England","South West":"South West England","West Midlands":"West Midlands","Yorkshire and The Humber":"Yorkshire & Humber"};
 const normPC=p=>String(p||"").toUpperCase().replace(/\s+/g,"");
 function pcRegion(r){return r.region?(REGION_MAP[r.region]||r.region):(r.country&&r.country!=="England"?r.country:"");}
@@ -1570,7 +1630,7 @@ function miles(a,b){const R=3958.8,rad=x=>x*Math.PI/180;const dLat=rad(b.lat-a.l
 function enquiryMatch(t){
   const key=normPC(t.postcode),g=GEO[key];
   if(key&&g===null)return{dist:null,tag:"⚠ Postcode '"+t.postcode+"' not recognised – please check"};
-  if(g){const d=miles(enq,g),r=t.radius||50;if(d<=r)return{dist:d,tag:Math.round(d)+" miles away"+(t.radius?"":" (default 50-mile range)")};return null;}
+  if(g){const d=miles(enq,g),r=t.radius||DEFAULT_RADIUS;if(d<=r)return{dist:d,tag:Math.round(d)+" miles away"+(t.radius?"":" (default "+DEFAULT_RADIUS+"-mile range)")};return null;}
   const area=(t.area||"").toLowerCase();
   if(area.includes("nationwide"))return{dist:null,tag:"Nationwide / Remote"};
   if(enq.county&&(t.county||"").toLowerCase().includes(enq.county.toLowerCase()))return{dist:null,tag:"Covers "+enq.county+" (no postcode set)"};
