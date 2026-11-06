@@ -681,7 +681,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
   <div id="sub-add-import" style="display:none">
     <div class="form-section">
       <h3 style="margin:0 0 6px;font-size:16px">Import postcodes / company names</h3>
-      <p style="font-size:13px;color:var(--tm);margin:0 0 12px">Upload a reviewed CSV with the columns <b>Name, Company, Postcode, County</b> (optional: <b>Radius</b>). Trainers are matched by exact name, checked, then only the location and company columns are updated. Nothing is written until you press Apply.</p>
+      <p style="font-size:13px;color:var(--tm);margin:0 0 12px">Upload a reviewed CSV with the columns <b>Name, Company, Postcode, County</b> (optional: <b>Radius</b>; other columns are ignored). If County is blank it is filled in from the postcode. Trainers are matched by exact name, checked, then only the location and company columns are updated. Nothing is written until you press Apply.</p>
       <input type="file" id="imp-file" accept=".csv,text/csv" onchange="impLoad(this.files[0])">
       <label style="display:flex;gap:8px;align-items:center;margin:12px 0;font-size:13px;text-transform:none;letter-spacing:0;color:var(--tx);font-weight:500"><input type="checkbox" id="imp-over" style="width:auto" onchange="impLoad(window._impFile)"> Overwrite values that already exist</label>
       <div id="imp-preview" style="overflow:auto;max-height:420px"></div>
@@ -1501,6 +1501,7 @@ async function impApply(){
       const cur=await graph(`${base}/range(address='A${r}:A${r}')`);
       if(String((cur.values&&cur.values[0]&&cur.values[0][0])||"").trim()!==t.name.trim())throw new Error("row changed – refresh and retry");
       const v={postcode:t.postcode||"",radius:t.radius||"",county:t.county||"",company:t.company||"",...x.set};
+      if(v.postcode&&!v.county)v.county=await countyFromPostcode(v.postcode);
       await graphPatch(`${base}/range(address='Q${r}:T${r}')`,{values:[[v.postcode,v.radius,v.county,v.company]]});
       await graphPatch(`${base}/range(address='O${r}:P${r}')`,{values:[[nowStamp(),currentUser?.name||""]]});
       done++;
