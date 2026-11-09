@@ -1365,6 +1365,7 @@ async function loadData(){
   }catch(e){showErr(e.message);}
 }
 
+function fixDiscount(d){if(typeof d==="number"&&d>0&&d<=1)return Math.round(d*10000)/100+"%";const t=String(d==null?"":d).trim();if(/^0?\.\d+$/.test(t)&&parseFloat(t)<=1)return Math.round(parseFloat(t)*10000)/100+"%";return d;}
 function parseSheet(r,type){
   const rows=r.values;if(!rows||rows.length<9)return[];
   const base=(r.rowIndex||0);
@@ -1383,7 +1384,7 @@ function parseSheet(r,type){
       lastUpdated:o["last updated"]||"",updatedBy:o["updated by"]||""
     });
     else out.push({
-      _rowIdx:i,_xlRow:base+i+1,name:o["company name"]||o.name,phone:o.phone,email:o.email,discount:o.discount,
+      _rowIdx:i,_xlRow:base+i+1,name:o["company name"]||o.name,phone:o.phone,email:o.email,discount:fixDiscount(o.discount),
       courses:(o["courses offered"]||"").split(",").map(s=>s.trim()).filter(Boolean),
       area:o["region / area"]||"",virtualDelivery:o["virtual?"]||"",paymentTerms:o["payment terms"]||"",
       county:o.county||"",active:(o.active||"Yes").toLowerCase()!=="no",website:o.website||"",
