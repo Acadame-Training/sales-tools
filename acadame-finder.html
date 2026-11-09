@@ -1337,6 +1337,7 @@ async function loadData(){
     }catch(e){console.warn("Could not add county header",e);}
     trainers=parseSheet(tRows,"trainer");
     partners=parseSheet(pRows,"partner");
+    await loadCustomCourses();renderCourseLists();
 
     showLoading("Loading quotes…");
     try{
@@ -1439,6 +1440,81 @@ function getCC(tab){return Array.from(el((tab==="t"?"t":"p")+"-cc-list").querySe
 function clearCC(tab){el((tab==="t"?"t":"p")+"-cc-list").querySelectorAll("input").forEach(cb=>cb.checked=false);updateCCBtn(tab,[]);if(tab==="t")renderT();else renderP();}
 function selectAllCC(tab){el((tab==="t"?"t":"p")+"-cc-list").querySelectorAll("input").forEach(cb=>cb.checked=true);const s=getCC(tab);updateCCBtn(tab,s);if(tab==="t")renderT();else renderP();}
 function updateCCBtn(tab,sel){const lbl=el(tab+"-cc-label"),badge=el(tab+"-cc-count");if(!sel.length){lbl.textContent="All courses";badge.style.display="none";}else if(sel.length===1){lbl.textContent=sel[0];badge.style.display="none";}else{lbl.textContent=sel.length+" courses";badge.textContent=sel.length;badge.style.display="inline-block";}}
+
+// ── Course lists (dynamic) ────────────────────────────────────────────────────
+const EXTRA_COURSES=["Driver CPC", "EUSR CAT 1 & 2", "EUSR SHEA Water", "EUSR Water Hygiene", "RAMS", "COSHH/Spill kit", "ISO", "PAT Testing / Electrical Training", "CITB HSA", "CITB SSSTS", "CITB SMSTS", "CITB TWC", "CITB TWS", "CITB DRHS", "CITB SEATS", "BESA 2 Day Cat 4 F-Gas", "Management of Legionella Bacteria in Hot and Cold Water Systems", "Senior/Authorised Person: High Voltage (Industrial and Commercial)", "AutoCAD Electrical training", "3 Day Petrol Filling Stations – Combined Construction – Audit and Inspection Course", "Network Construction Operations Gas Level 1", "2391-51 Periodic Inspection – Testing & Reporting of Electrical Installations", "NHSS12 TTMBC", "Authorised Person Lift Management (HTM 08-02)", "Avoiding Overhead Power lines (GS6)", "HSG47 CAT & Genny - Detection and Avoidance of Buried Services", "Ladder Association – Ladders and Stepladders (Combined User & Inspector)", "OFTEC 201 Oil Two-Stage Pressure Jet Burner Training Course", "MJI 10 – Hand Tightening & MJI 19 Torque Tightening 1 day + E-Learning", "CIBSE TM44 (Air Conditioning Inspection for Buildings)"];
+let customCourses=[];
+const COURSE_SHEET="Courses";
+function cleanCourse(n){return String(n||"").replace(/\s*,\s*/g," – ").replace(/\s+/g," ").trim();}
+function allCourseNames(type){
+  const out=[],seen=new Set();
+  const add=n=>{n=cleanCourse(n);if(!n)return;const k=n.toLowerCase();if(seen.has(k))return;seen.add(k);out.push(n);};
+  (COURSE_BASE[type]||[]).forEach(add);EXTRA_COURSES.forEach(add);customCourses.forEach(add);
+  (type==="t"?trainers:partners).forEach(x=>(x.courses||[]).forEach(add));
+  return out.sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:"base",numeric:true}));
+}
+const COURSE_BASE={t:[],p:[]};
+function initCourseBase(){
+  COURSE_BASE.t=Array.from(document.querySelectorAll('#at-courses input')).map(i=>i.value);
+  COURSE_BASE.p=Array.from(document.querySelectorAll('#ab-courses input')).map(i=>i.value);
+}
+const escA=v=>String(v).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+function renderCourseLists(){
+  if(!COURSE_BASE.t.length&&!COURSE_BASE.p.length)initCourseBase();
+  [["t","at-courses","tcourse","fc"],["t","et-courses","tcourse","fc"],["p","ab-courses","pcourse","fc"],["p","ep-courses","pcourse","fc"],["t","t-cc-list","","cc"],["p","p-cc-list","","cc"]].forEach(([type,id,name,kind])=>{
+    const box=el(id);if(!box)return;
+    const checked=new Set(Array.from(box.querySelectorAll("input:checked")).map(i=>i.value));
+    const names=allCourseNames(type);
+    box.innerHTML=names.map(n=>kind==="fc"
+      ?`<label class="fc-item"><input type="checkbox" value="${escA(n)}" name="${name}"${checked.has(n)?" checked":""}><span>${escA(n)}</span></label>`
+      :`<label class="cc-item"><input type="checkbox" value="${escA(n)}" onchange="${type==="t"?"renderT()":"renderP()"}"${checked.has(n)?" checked":""}><span>${escA(n)}</span></label>`).join("");
+    if(kind==="fc"&&!box.dataset.addc){
+      box.dataset.addc="1";
+      const bar=document.createElement("div");
+      bar.style.cssText="display:flex;gap:6px;padding:6px 8px;border-bottom:1px solid var(--br);background:#F5F7FA";
+      bar.innerHTML=`<input type="text" id="${id}-new" placeholder="Course not listed? Type it here…" style="flex:1;border:1px solid var(--bs);border-radius:6px;padding:5px 8px;font-size:12px;font-family:inherit" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addNewCourse(\'${id}\')}"><button type="button" class="clr" style="padding:4px 10px" onclick="addNewCourse(\'${id}\')">+ Add course</button>`;
+      box.previousElementSibling.insertAdjacentElement("afterend",bar);
+    }
+  });
+}
+async function loadCustomCourses(){
+  try{
+    const r=await graph(`/drives/${driveId}/items/${tFileId}/workbook/worksheets/${COURSE_SHEET}/usedRange`);
+    customCourses=(r.values||[]).slice(1).map(v=>cleanCourse(v[0])).filter(Boolean);
+  }catch(e){
+    try{customCourses=JSON.parse(localStorage.getItem("acadame_courses_v1")||"[]");}catch(_){customCourses=[];}
+  }
+}
+async function saveCustomCourse(name){
+  try{localStorage.setItem("acadame_courses_v1",JSON.stringify(customCourses));}catch(e){}
+  const base=`/drives/${driveId}/items/${tFileId}/workbook/worksheets`;
+  let used=null;
+  try{used=await graph(`${base}/${COURSE_SHEET}/usedRange`);}
+  catch(e){
+    await graphPost(`${base}/add`,{name:COURSE_SHEET});
+    await graphPatch(`${base}/${COURSE_SHEET}/range(address='A1:A1')`,{values:[["Added courses (managed by the Finder tool)"]]});
+    used={rowIndex:0,rowCount:1};
+  }
+  const next=(used.rowIndex||0)+(used.rowCount||1)+1;
+  await graphPatch(`${base}/${COURSE_SHEET}/range(address='A${next}:A${next}')`,{values:[[name]]});
+}
+async function addNewCourse(boxId){
+  const inp=el(boxId+"-new");const name=cleanCourse(inp.value);
+  if(!name){toast("Type the course name first");return;}
+  const type=boxId.startsWith("ab")||boxId.startsWith("ep")?"p":"t";
+  const exist=allCourseNames(type).find(n=>n.toLowerCase()===name.toLowerCase());
+  let useName=exist||name;
+  if(!exist){
+    customCourses.push(name);
+    try{await saveCustomCourse(name);toast("Course added for everyone: "+name);}
+    catch(e){console.warn(e);toast("Course added on this computer only (couldn't save to the shared file)");}
+  }else toast("Already in the list – ticked it for you");
+  customCourses=customCourses.filter(c=>c);
+  renderCourseLists();
+  const cb=Array.from(el(boxId).querySelectorAll("input")).find(i=>i.value===useName);
+  if(cb)cb.checked=true;
+  inp.value="";filterFormCourses(boxId,"");
+}
 function filterFormCourses(id,val){const v=val.toLowerCase();el(id).querySelectorAll(".fc-item").forEach(item=>{item.classList.toggle("hidden",!item.querySelector("span").textContent.toLowerCase().includes(v));}); }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
